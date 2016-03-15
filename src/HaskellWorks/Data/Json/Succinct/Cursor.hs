@@ -13,6 +13,7 @@ import           Data.String
 import qualified Data.Vector.Storable                                       as DVS
 import           Data.Word
 import           Foreign.ForeignPtr
+import           HaskellWorks.Data.Bits.BitWise
 import           HaskellWorks.Data.Bits.FromBools
 import           HaskellWorks.Data.Conduit.Json
 import           HaskellWorks.Data.Json.Succinct.Transform
@@ -225,10 +226,31 @@ instance TreeCursor (JsonCursor BS.ByteString (DVS.Vector Word8)) where
   depth       k = BP.depth (balancedParens k) (cursorRank k)
   subtreeSize k = BP.subtreeSize (balancedParens k) (cursorRank k)
 
-class FromForeignRegion a where
-  fromForeignRegion :: (ForeignPtr Word8, Int, Int) -> a
+instance TreeCursor (JsonCursor BS.ByteString (DVS.Vector Word16)) where
+  firstChild  k = k { cursorRank = BP.firstChild   (balancedParens k) (cursorRank k) }
+  nextSibling k = k { cursorRank = BP.nextSibling  (balancedParens k) (cursorRank k) }
+  parent      k = k { cursorRank = BP.parent       (balancedParens k) (cursorRank k) }
+  depth       k = BP.depth (balancedParens k) (cursorRank k)
+  subtreeSize k = BP.subtreeSize (balancedParens k) (cursorRank k)
 
-instance FromForeignRegion (JsonCursor BS.ByteString (DVS.Vector Word8)) where
+instance TreeCursor (JsonCursor BS.ByteString (DVS.Vector Word32)) where
+  firstChild  k = k { cursorRank = BP.firstChild   (balancedParens k) (cursorRank k) }
+  nextSibling k = k { cursorRank = BP.nextSibling  (balancedParens k) (cursorRank k) }
+  parent      k = k { cursorRank = BP.parent       (balancedParens k) (cursorRank k) }
+  depth       k = BP.depth (balancedParens k) (cursorRank k)
+  subtreeSize k = BP.subtreeSize (balancedParens k) (cursorRank k)
+
+instance TreeCursor (JsonCursor BS.ByteString (DVS.Vector Word64)) where
+  firstChild  k = k { cursorRank = BP.firstChild   (balancedParens k) (cursorRank k) }
+  nextSibling k = k { cursorRank = BP.nextSibling  (balancedParens k) (cursorRank k) }
+  parent      k = k { cursorRank = BP.parent       (balancedParens k) (cursorRank k) }
+  depth       k = BP.depth (balancedParens k) (cursorRank k)
+  subtreeSize k = BP.subtreeSize (balancedParens k) (cursorRank k)
+
+class FromForeignRegion a where
+  fromForeignRegion :: (ForeignPtr Word8, Int, Int) -> JsonCursor BS.ByteString a
+
+instance FromForeignRegion (DVS.Vector Word8) where
   fromForeignRegion :: (ForeignPtr Word8, Int, Int) -> JsonCursor BS.ByteString (DVS.Vector Word8)
   fromForeignRegion (fptr, offset, size) = JsonCursor
     { cursorText     = textBS
@@ -242,3 +264,54 @@ instance FromForeignRegion (JsonCursor BS.ByteString (DVS.Vector Word8)) where
           genInterest bs  = if BS.null bs
             then Nothing
             else Just (BS.head bs, BS.tail bs)
+
+instance FromForeignRegion (DVS.Vector Word16) where
+  fromForeignRegion :: (ForeignPtr Word8, Int, Int) -> JsonCursor BS.ByteString (DVS.Vector Word16)
+  fromForeignRegion (fptr, offset, size) = JsonCursor
+    { cursorText     = textBS
+    , interests      = Simple interestsV
+    , balancedParens = SimpleBalancedParens (DVS.unfoldr fromBools (jsonToInterestBalancedParens [textBS]))
+    , cursorRank     = 1
+    }
+    where textBS          = BSI.fromForeignPtr (castForeignPtr fptr) offset size :: ByteString
+          interestBS      = BS.concat $ runListConduit [textBS] (textToJsonToken =$= jsonToken2Markers =$= markerToByteString)
+          interestsV      = DVS.unfoldr genInterest interestBS :: DVS.Vector Word16
+          genInterest bs  = go (BS.unpack (BS.take 2 bs)) (BS.drop 2 bs)
+            where go []      _ = Nothing
+                  go [a, b] ts = Just (fromIntegral a .|. (fromIntegral b .<. 8), BS.tail ts)
+                  go [a]    ts = Just (fromIntegral a                           , BS.tail ts)
+                  go _      _  = error "This should never happen"
+
+instance FromForeignRegion (DVS.Vector Word32) where
+  fromForeignRegion :: (ForeignPtr Word8, Int, Int) -> JsonCursor BS.ByteString (DVS.Vector Word32)
+  fromForeignRegion (fptr, offset, size) = JsonCursor
+    { cursorText     = textBS
+    , interests      = Simple interestsV
+    , balancedParens = SimpleBalancedParens (DVS.unfoldr fromBools (jsonToInterestBalancedParens [textBS]))
+    , cursorRank     = 1
+    }
+    where textBS          = BSI.fromForeignPtr (castForeignPtr fptr) offset size :: ByteString
+          interestBS      = BS.concat $ runListConduit [textBS] (textToJsonToken =$= jsonToken2Markers =$= markerToByteString)
+          interestsV      = DVS.unfoldr genInterest interestBS :: DVS.Vector Word32
+          genInterest bs  = go (BS.unpack (BS.take 2 bs)) (BS.drop 2 bs)
+            where go []      _ = Nothing
+                  go [a, b] ts = Just (fromIntegral a .|. (fromIntegral b .<. 16) , BS.tail ts)
+                  go [a]    ts = Just (fromIntegral a                             , BS.tail ts)
+                  go _      _  = error "This should never happen"
+
+instance FromForeignRegion (DVS.Vector Word64) where
+  fromForeignRegion :: (ForeignPtr Word8, Int, Int) -> JsonCursor BS.ByteString (DVS.Vector Word64)
+  fromForeignRegion (fptr, offset, size) = JsonCursor
+    { cursorText     = textBS
+    , interests      = Simple interestsV
+    , balancedParens = SimpleBalancedParens (DVS.unfoldr fromBools (jsonToInterestBalancedParens [textBS]))
+    , cursorRank     = 1
+    }
+    where textBS          = BSI.fromForeignPtr (castForeignPtr fptr) offset size :: ByteString
+          interestBS      = BS.concat $ runListConduit [textBS] (textToJsonToken =$= jsonToken2Markers =$= markerToByteString)
+          interestsV      = DVS.unfoldr genInterest interestBS :: DVS.Vector Word64
+          genInterest bs  = go (BS.unpack (BS.take 2 bs)) (BS.drop 2 bs)
+            where go []      _ = Nothing
+                  go [a, b] ts = Just (fromIntegral a .|. (fromIntegral b .<. 32) , BS.tail ts)
+                  go [a]    ts = Just (fromIntegral a                             , BS.tail ts)
+                  go _      _  = error "This should never happen"
