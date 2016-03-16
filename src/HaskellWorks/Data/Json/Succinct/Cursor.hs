@@ -7,14 +7,11 @@ module HaskellWorks.Data.Json.Succinct.Cursor where
 import qualified Data.ByteString                                            as BS
 import qualified Data.ByteString.Char8                                      as BSC
 import           Data.ByteString.Internal                                   as BSI
-import           Data.Char
 import           Data.Conduit
 import           Data.String
 import qualified Data.Vector.Storable                                       as DVS
 import           Data.Word
-import           Debug.Trace
 import           Foreign.ForeignPtr
-import           HaskellWorks.Data.Bits.BitWise
 import           HaskellWorks.Data.Bits.FromBools
 import           HaskellWorks.Data.Conduit.Json
 import           HaskellWorks.Data.Json.Succinct.Transform
@@ -200,8 +197,8 @@ instance HasJsonCursorType (JsonCursor BS.ByteString (DVS.Vector Word8)) where
           bpk = balancedParens k
 
 instance HasJsonCursorType (JsonCursor BS.ByteString (DVS.Vector Word16)) where
-  jsonCursorType k = let x = jsonCursorType' c in trace ("--> jsonCursorType " ++ show k ++ " c: " ++ show c) x
-    where c   = cursorText k `BS.index` trace ("i ---> " ++ show i ++ " r: " ++ show r ++ " ik: " ++ show ik ++ " bpk: " ++ show bpk) i
+  jsonCursorType k = jsonCursorType' c
+    where c   = cursorText k `BS.index` i
           i   = fromIntegral (select1 ik r - 1)
           r   = rank1 bpk (cursorRank k)
           ik  = interests k

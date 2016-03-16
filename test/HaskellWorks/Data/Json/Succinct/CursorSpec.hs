@@ -14,7 +14,6 @@ import qualified Data.Vector.Storable                   as DVS
 import           Data.Word
 import           HaskellWorks.Data.Bits.BitPrint
 import           HaskellWorks.Data.Bits.BitString
-import           HaskellWorks.Data.Json.Succinct
 import           HaskellWorks.Data.Json.Succinct.Cursor as C
 import           HaskellWorks.Data.Positioning
 import           System.IO.MMap
@@ -116,15 +115,15 @@ spec = describe "HaskellWorks.Data.Json.Succinct.CursorSpec" $ do
 shouldBeginWith :: (Eq a, Show a) => [a] -> [a] -> IO ()
 shouldBeginWith as bs = take (length bs) as `shouldBe` bs
 
-genSpec :: forall t . ( Eq t,
-                        BitPrint t,
-                        -- Eq (JsonCursor BS.ByteString t),
-                        FromForeignRegion t,
-                        IsString          (JsonCursor BS.ByteString t),
-                        HasJsonCursorType (JsonCursor BS.ByteString t),
-                        TreeCursor        (JsonCursor BS.ByteString t),
-                        Show t)
-        => String -> t -> SpecWith ()
+genSpec :: forall t .
+  ( Eq                t
+  , BitPrint          t
+  , FromForeignRegion t
+  , IsString          (JsonCursor BS.ByteString t)
+  , HasJsonCursorType (JsonCursor BS.ByteString t)
+  , TreeCursor        (JsonCursor BS.ByteString t)
+  , Show              t)
+  => String -> t -> SpecWith ()
 genSpec t _ = do
   describe ("Cursor for (" ++ t ++ ")") $ do
     it "initialises to beginning of empty object" $ do
@@ -132,7 +131,6 @@ genSpec t _ = do
       jsonCursorType cursor `shouldBe` JsonCursorObject
     it "initialises to beginning of empty object preceded by spaces" $ do
       let cursor = " {}" :: JsonCursor BS.ByteString t
-      print $ t ++ " <-> " ++ show cursor
       jsonCursorType cursor `shouldBe` JsonCursorObject
     it "initialises to beginning of number" $ do
       let cursor = "1234" :: JsonCursor BS.ByteString t
@@ -182,35 +180,19 @@ genSpec t _ = do
     it "can navigate down and forwards" $ do
       (fptr, offset, size) <- mmapFileForeignPtr "test/Resources/sample.json" ReadOnly Nothing
       let cursor = fromForeignRegion (fptr, offset, size) :: JsonCursor BS.ByteString t
-      print $ "---> " ++ t ++ " a "
       jsonCursorType                                                              cursor  `shouldBe` JsonCursorObject
-      print $ "---> " ++ t ++ " b "
       jsonCursorType ((                                                       fc) cursor) `shouldBe` JsonCursorString
-      print $ "---> " ++ t ++ " c "
-      let k = jsonCursorType ((                                                  ns . fc) cursor)
-      print $ "---> " ++ t ++ " d ... " ++ show k
       jsonCursorType ((                                                  ns . fc) cursor) `shouldBe` JsonCursorObject
-      print $ "---> " ++ t ++ " d "
       jsonCursorType ((                                             fc . ns . fc) cursor) `shouldBe` JsonCursorString
-      print $ "---> " ++ t ++ " e "
       jsonCursorType ((                                        ns . fc . ns . fc) cursor) `shouldBe` JsonCursorString
-      print $ "---> " ++ t ++ " f "
       jsonCursorType ((                                   ns . ns . fc . ns . fc) cursor) `shouldBe` JsonCursorString
-      print $ "---> " ++ t ++ " g "
       jsonCursorType ((                              ns . ns . ns . fc . ns . fc) cursor) `shouldBe` JsonCursorObject
-      print $ "---> " ++ t ++ " h "
       jsonCursorType ((                         fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` JsonCursorString
-      print $ "---> " ++ t ++ " i "
       jsonCursorType ((                    ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` JsonCursorString
-      print $ "---> " ++ t ++ " j "
       jsonCursorType ((               ns . ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` JsonCursorString
-      print $ "---> " ++ t ++ " k "
       jsonCursorType ((          ns . ns . ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` JsonCursorString
-      print $ "---> " ++ t ++ " l "
       jsonCursorType ((     ns . ns . ns . ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` JsonCursorString
-      print $ "---> " ++ t ++ " m "
       jsonCursorType ((ns . ns . ns . ns . ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` JsonCursorNumber
-      print $ "---> " ++ t ++ " n "
     it "can navigate up" $ do
       (fptr, offset, size) <- mmapFileForeignPtr "test/Resources/sample.json" ReadOnly Nothing
       let cursor = fromForeignRegion (fptr, offset, size) :: JsonCursor BS.ByteString t
@@ -242,4 +224,3 @@ genSpec t _ = do
       ss ((          ns . ns . ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` 1
       ss ((     ns . ns . ns . ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` 1
       ss ((ns . ns . ns . ns . ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` 1
-

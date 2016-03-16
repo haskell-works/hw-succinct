@@ -21,7 +21,6 @@ module HaskellWorks.Data.Succinct.RankSelect.Simple
 import qualified Data.Vector                                                as DV
 import qualified Data.Vector.Storable                                       as DVS
 import           Data.Word
-import           Debug.Trace
 import           HaskellWorks.Data.Bits.BitLength
 import           HaskellWorks.Data.Bits.BitPrint
 import           HaskellWorks.Data.Bits.BitString
@@ -152,13 +151,11 @@ instance Rank1 (Simple (DVS.Vector Word64)) where
   {-# INLINABLE rank1 #-}
 
 instance Select1 (Simple (DVS.Vector Word8)) where
-  select1 (Simple v) p = let x = select1 v p in
-    trace ("--> select1(8) " P.++ P.show v P.++ " " P.++ P.show p P.++ " => " P.++ P.show x) x
+  select1 (Simple v) = select1 v
   {-# INLINABLE select1 #-}
 
 instance Select1 (Simple (DVS.Vector Word16))  where
-  select1 (Simple v) p = let x = select1 v p in
-    trace ("--> select1(16) " P.++ P.show v P.++ " " P.++ P.show p P.++ " => " P.++ P.show x) x
+  select1 (Simple v) = select1 v
   {-# INLINABLE select1 #-}
 
 instance Select1 (Simple (DVS.Vector Word32))  where
@@ -168,25 +165,3 @@ instance Select1 (Simple (DVS.Vector Word32))  where
 instance Select1 (Simple (DVS.Vector Word64))  where
   select1 (Simple v) = select1 v
   {-# INLINABLE select1 #-}
-
-rankWords :: (P.Num a, PopCount1 a, Rank1 a, BitLength a) => [a] -> Count -> Count
-rankWords ws n = if remainder P.== 0
-    then predRank
-    else predRank P.+ partRank
-  where
-    partRank = rank1 r remainder
-    remainder = n `P.mod` endPos
-    (ls, rs) = P.splitAt (P.fromIntegral P.$ n `P.quot` endPos) ws
-    predRank = P.sum (P.map (P.fromIntegral P.. popCount1) ls)
-    r = headDef 0 rs
-    endPos = bitLength (P.head ws)
-{-# INLINABLE rankWords #-}
-
-selectWords :: (PopCount1 v, Select1 v, BitLength v) => Count -> [v] -> Count -> Count
-selectWords _ [] r = r P.+ 1
-selectWords n (w:ws) r = if pc P.< n
-    then selectWords (n P.- pc) ws (r P.+ bitLength w)
-    else select1 w n P.+ r
-  where
-    pc = popCount1 w
-{-# INLINABLE selectWords #-}
