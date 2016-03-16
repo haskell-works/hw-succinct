@@ -270,50 +270,50 @@ instance FromForeignRegion (DVS.Vector Word8) where
 instance FromForeignRegion (DVS.Vector Word16) where
   fromForeignRegion :: (ForeignPtr Word8, Int, Int) -> JsonCursor BS.ByteString (DVS.Vector Word16)
   fromForeignRegion (fptr, offset, size) = JsonCursor
-    { cursorText     = textBS
-    , interests      = Simple interestsV
-    , balancedParens = SimpleBalancedParens (DVS.unfoldr fromBools (jsonToInterestBalancedParens [textBS]))
-    , cursorRank     = 1
+    { cursorText      = textBS
+    , cursorRank      = 1
+    , balancedParens  = SimpleBalancedParens bpV
+    , interests       = Simple interestsV
     }
-    where textBS          = BSI.fromForeignPtr (castForeignPtr fptr) offset size :: ByteString
-          interestBS      = BS.concat $ runListConduit [textBS] (textToJsonToken =$= jsonToken2Markers =$= markerToByteString)
-          interestsV      = DVS.unfoldr genInterest interestBS :: DVS.Vector Word16
-          genInterest bs  = go (BS.unpack (BS.take 2 bs)) (BS.drop 2 bs)
-            where go []      _ = Nothing
-                  go [a, b] ts = Just (fromIntegral a .|. (fromIntegral b .<. 8), BS.tail ts)
-                  go [a]    ts = Just (fromIntegral a                           , BS.tail ts)
-                  go _      _  = error "This should never happen"
+    where textBS           = BSI.fromForeignPtr (castForeignPtr fptr) offset size :: ByteString
+          interestBS       = BS.concat $ runListConduit [textBS] (textToJsonToken =$= jsonToken2Markers =$= markerToByteString)
+          interestBS'      = applyToMultipleOf (`BS.snoc` 0) interestBS 2
+          interestsV       = DVS.unsafeCast (DVS.unfoldr genInterest interestBS') :: DVS.Vector Word16
+          genInterest bs   = if BS.null bs
+            then Nothing
+            else Just (BS.head bs, BS.tail bs)
+          bpV             = DVS.unfoldr fromBools (jsonToInterestBalancedParens [textBS])
 
 instance FromForeignRegion (DVS.Vector Word32) where
   fromForeignRegion :: (ForeignPtr Word8, Int, Int) -> JsonCursor BS.ByteString (DVS.Vector Word32)
   fromForeignRegion (fptr, offset, size) = JsonCursor
-    { cursorText     = textBS
-    , interests      = Simple interestsV
-    , balancedParens = SimpleBalancedParens (DVS.unfoldr fromBools (jsonToInterestBalancedParens [textBS]))
-    , cursorRank     = 1
+    { cursorText      = textBS
+    , cursorRank      = 1
+    , balancedParens  = SimpleBalancedParens bpV
+    , interests       = Simple interestsV
     }
-    where textBS          = BSI.fromForeignPtr (castForeignPtr fptr) offset size :: ByteString
-          interestBS      = BS.concat $ runListConduit [textBS] (textToJsonToken =$= jsonToken2Markers =$= markerToByteString)
-          interestsV      = DVS.unfoldr genInterest interestBS :: DVS.Vector Word32
-          genInterest bs  = go (BS.unpack (BS.take 2 bs)) (BS.drop 2 bs)
-            where go []      _ = Nothing
-                  go [a, b] ts = Just (fromIntegral a .|. (fromIntegral b .<. 16) , BS.tail ts)
-                  go [a]    ts = Just (fromIntegral a                             , BS.tail ts)
-                  go _      _  = error "This should never happen"
+    where textBS           = BSI.fromForeignPtr (castForeignPtr fptr) offset size :: ByteString
+          interestBS       = BS.concat $ runListConduit [textBS] (textToJsonToken =$= jsonToken2Markers =$= markerToByteString)
+          interestBS'      = applyToMultipleOf (`BS.snoc` 0) interestBS 4
+          interestsV       = DVS.unsafeCast (DVS.unfoldr genInterest interestBS') :: DVS.Vector Word32
+          genInterest bs   = if BS.null bs
+            then Nothing
+            else Just (BS.head bs, BS.tail bs)
+          bpV             = DVS.unfoldr fromBools (jsonToInterestBalancedParens [textBS])
 
 instance FromForeignRegion (DVS.Vector Word64) where
   fromForeignRegion :: (ForeignPtr Word8, Int, Int) -> JsonCursor BS.ByteString (DVS.Vector Word64)
   fromForeignRegion (fptr, offset, size) = JsonCursor
-    { cursorText     = textBS
-    , interests      = Simple interestsV
-    , balancedParens = SimpleBalancedParens (DVS.unfoldr fromBools (jsonToInterestBalancedParens [textBS]))
-    , cursorRank     = 1
+    { cursorText      = textBS
+    , cursorRank      = 1
+    , balancedParens  = SimpleBalancedParens bpV
+    , interests       = Simple interestsV
     }
-    where textBS          = BSI.fromForeignPtr (castForeignPtr fptr) offset size :: ByteString
-          interestBS      = BS.concat $ runListConduit [textBS] (textToJsonToken =$= jsonToken2Markers =$= markerToByteString)
-          interestsV      = DVS.unfoldr genInterest interestBS :: DVS.Vector Word64
-          genInterest bs  = go (BS.unpack (BS.take 2 bs)) (BS.drop 2 bs)
-            where go []      _ = Nothing
-                  go [a, b] ts = Just (fromIntegral a .|. (fromIntegral b .<. 32) , BS.tail ts)
-                  go [a]    ts = Just (fromIntegral a                             , BS.tail ts)
-                  go _      _  = error "This should never happen"
+    where textBS           = BSI.fromForeignPtr (castForeignPtr fptr) offset size :: ByteString
+          interestBS       = BS.concat $ runListConduit [textBS] (textToJsonToken =$= jsonToken2Markers =$= markerToByteString)
+          interestBS'      = applyToMultipleOf (`BS.snoc` 0) interestBS 8
+          interestsV       = DVS.unsafeCast (DVS.unfoldr genInterest interestBS') :: DVS.Vector Word64
+          genInterest bs   = if BS.null bs
+            then Nothing
+            else Just (BS.head bs, BS.tail bs)
+          bpV             = DVS.unfoldr fromBools (jsonToInterestBalancedParens [textBS])
