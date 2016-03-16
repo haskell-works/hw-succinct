@@ -12,6 +12,7 @@ import           Data.Conduit
 import           Data.String
 import qualified Data.Vector.Storable                                       as DVS
 import           Data.Word
+import           Debug.Trace
 import           Foreign.ForeignPtr
 import           HaskellWorks.Data.Bits.BitWise
 import           HaskellWorks.Data.Bits.FromBools
@@ -199,9 +200,10 @@ instance HasJsonCursorType (JsonCursor BS.ByteString (DVS.Vector Word8)) where
           bpk = balancedParens k
 
 instance HasJsonCursorType (JsonCursor BS.ByteString (DVS.Vector Word16)) where
-  jsonCursorType k = jsonCursorType' c
-    where c   = cursorText k `BS.index` i
-          i   = fromIntegral (select1 ik (rank1 bpk (cursorRank k)) - 1)
+  jsonCursorType k = let x = jsonCursorType' c in trace ("--> jsonCursorType " ++ show k ++ " c: " ++ show c) x
+    where c   = cursorText k `BS.index` trace ("i ---> " ++ show i ++ " r: " ++ show r ++ " ik: " ++ show ik ++ " bpk: " ++ show bpk) i
+          i   = fromIntegral (select1 ik r - 1)
+          r   = rank1 bpk (cursorRank k)
           ik  = interests k
           bpk = balancedParens k
 

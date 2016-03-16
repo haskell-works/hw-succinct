@@ -21,6 +21,7 @@ module HaskellWorks.Data.Succinct.RankSelect.Simple
 import qualified Data.Vector                                                as DV
 import qualified Data.Vector.Storable                                       as DVS
 import           Data.Word
+import           Debug.Trace
 import           HaskellWorks.Data.Bits.BitLength
 import           HaskellWorks.Data.Bits.BitPrint
 import           HaskellWorks.Data.Bits.BitString
@@ -151,11 +152,13 @@ instance Rank1 (Simple (DVS.Vector Word64)) where
   {-# INLINABLE rank1 #-}
 
 instance Select1 (Simple (DVS.Vector Word8)) where
-  select1 (Simple v) = select1 v
+  select1 (Simple v) p = let x = select1 v p in
+    trace ("--> select1(8) " P.++ P.show v P.++ " " P.++ P.show p P.++ " => " P.++ P.show x) x
   {-# INLINABLE select1 #-}
 
 instance Select1 (Simple (DVS.Vector Word16))  where
-  select1 (Simple v) = select1 v
+  select1 (Simple v) p = let x = select1 v p in
+    trace ("--> select1(16) " P.++ P.show v P.++ " " P.++ P.show p P.++ " => " P.++ P.show x) x
   {-# INLINABLE select1 #-}
 
 instance Select1 (Simple (DVS.Vector Word32))  where
