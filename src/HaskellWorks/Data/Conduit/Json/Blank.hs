@@ -1,4 +1,6 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
 
 module HaskellWorks.Data.Conduit.Json.Blank
   ( blankEscapedChars
@@ -6,15 +8,20 @@ module HaskellWorks.Data.Conduit.Json.Blank
   , blankNumbers
   , blankStrings
   , blankJson
+  , rechunkBS
+  , rechunkV
   ) where
 
+import           Conduit
 import           Control.Monad
-import           Control.Monad.Trans.Resource         (MonadThrow)
 import           Data.ByteString                      as BS
-import           Data.Conduit
+import           Data.ByteVector
+import           Data.Mutable
+import qualified Data.Vector.Storable                 as DVS
 import           Data.Word
 import           HaskellWorks.Data.Conduit.Json.Words
 import           Prelude                              as P
+
 
 blankEscapedChars :: MonadThrow m => Conduit BS.ByteString m BS.ByteString
 blankEscapedChars = blankEscapedChars' ""
@@ -36,6 +43,12 @@ blankEscapedChars' rs = do
       Just (c, cs) | c /= wBackslash  -> Just (c, (False, cs))
       Just (c, cs)                    -> Just (c, (True, cs))
       Nothing                         -> Nothing
+
+rechunkBS :: (MonadBase base m, PrimMonad base) => Conduit BS.ByteString m BS.ByteString
+rechunkBS = mapC toByteVector =$= rechunkV =$= mapC fromByteVector
+
+rechunkV :: (MonadBase base m, PrimMonad base) => Conduit (DVS.Vector Word8) m (DVS.Vector Word8)
+rechunkV = vectorBuilderC 512 $ \yield' -> mapM_CE (\x -> yield' x >> yield' x)
 
 blankStrings :: MonadThrow m => Conduit BS.ByteString m BS.ByteString
 blankStrings = blankStrings' False
