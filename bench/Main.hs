@@ -1,14 +1,19 @@
-{-# LANGUAGE BangPatterns        #-}
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE BangPatterns          #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
 
 module Main where
 
+import           Conduit
+import           Control.Monad
 import           Control.Monad.Trans.Resource                        (MonadThrow)
 import           Criterion.Main
 import qualified Data.ByteString                                     as BS
 import qualified Data.ByteString.Internal                            as BSI
 import           Data.Conduit                                        (Conduit,
                                                                       (=$=))
+import qualified Data.Conduit.List                                   as CL
+import           Data.Mutable
 import qualified Data.Vector.Storable                                as DVS
 import           Data.Word
 import           Foreign
@@ -46,6 +51,11 @@ runBlankIdentifiers bs = BS.concat $ runListConduit blankIdentifiers [bs]
 runCon :: Conduit i [] BS.ByteString -> i -> BS.ByteString
 runCon con bs = BS.concat $ runListConduit con [bs]
 
+runConIO :: BS.ByteString -> IO BS.ByteString
+runConIO bs = do
+  cs <- CL.sourceList [bs] =$= rechunkBS $$ CL.consume
+  return (BS.concat cs)
+
 jsonToInterestBits3 :: MonadThrow m => Conduit BS.ByteString m BS.ByteString
 jsonToInterestBits3 = blankEscapedChars =$= blankStrings =$= blankNumbers =$= blankIdentifiers =$= blankedJsonToInterestBits
 
@@ -76,6 +86,7 @@ benchRankJson40Conduits =
     , bench "Run blankedJsonToInterestBits    "  (whnf (runCon blankedJsonToInterestBits  ) bs)
     , bench "Run jsonToInterestBits3          "  (whnf (runCon jsonToInterestBits3        ) bs)
     , bench "Run jsonToInterestBitsOld        "  (whnf (runCon jsonToInterestBitsOld      ) bs)
+    , bench "Run rechunkBS                    "  (whnfIO (runConIO bs))
     , bench "loadJson                         "  (whnf  loadJson                            bs)
     ]
   ]
@@ -95,4 +106,4 @@ benchRankJsonBigConduits =
   ]
 
 main :: IO ()
-main = defaultMain benchRankJson80Conduits
+main = defaultMain benchRankJson40Conduits

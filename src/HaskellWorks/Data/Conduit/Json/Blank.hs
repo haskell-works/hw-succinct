@@ -48,7 +48,7 @@ rechunkBS :: (MonadBase base m, PrimMonad base) => Conduit BS.ByteString m BS.By
 rechunkBS = mapC toByteVector =$= rechunkV =$= mapC fromByteVector
 
 rechunkV :: (MonadBase base m, PrimMonad base) => Conduit (DVS.Vector Word8) m (DVS.Vector Word8)
-rechunkV = vectorBuilderC 512 $ \yield' -> mapM_CE (\x -> yield' x >> yield' x)
+rechunkV = vectorBuilderC 4096 $ \yield' -> mapM_CE yield'
 
 blankStrings :: MonadThrow m => Conduit BS.ByteString m BS.ByteString
 blankStrings = blankStrings' False

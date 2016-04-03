@@ -171,9 +171,10 @@ benchmark bench
         base            >= 4       && < 5   ,
         bytestring                          ,
         conduit                             ,
+        conduit-combinators                 ,
         criterion       >= 1.1.0.0 && < 1.2 ,
         hw-succinct                         ,
         mmap                                ,
+        mutable-containers                  ,
         resourcet                           ,
         vector          >= 0.6     && < 0.12
-
