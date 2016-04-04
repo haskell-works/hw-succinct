@@ -64,13 +64,28 @@ Run the following in the shell:
 
 ## Examples
 
-    import Foreign
-    import qualified Data.Vector.Storable as DVS
-    import qualified Data.ByteString as BS
-    import qualified Data.ByteString.Internal as BSI
-    import System.IO.MMap
-    import Data.Word
-    import System.CPUTime
+    import           Data.Conduit                                        (Conduit, (=$=))
+    import           Data.Word
+    import           Foreign
+    import           HaskellWorks.Data.Bits.BitShown
+    import           HaskellWorks.Data.Conduit.Json
+    import           HaskellWorks.Data.Conduit.Json.Blank
+    import           HaskellWorks.Data.Conduit.List
+    import           HaskellWorks.Data.FromByteString
+    import           HaskellWorks.Data.FromForeignRegion
+    import           HaskellWorks.Data.Json.Succinct.Cursor
+    import           HaskellWorks.Data.Positioning
+    import           HaskellWorks.Data.Succinct.BalancedParens.Simple
+    import           HaskellWorks.Data.Succinct.RankSelect.Binary.Basic
+    import           HaskellWorks.Data.Time
+    import           System.CPUTime
+    import           System.IO.MMap
+    import           System.IO.MMap
+    import qualified Data.ByteString                                     as BS
+    import qualified Data.ByteString.Internal                            as BSI
+    import qualified Data.Vector.Storable                                as DVS
+    import qualified HaskellWorks.Data.Bits.PopCount.PopCount1.Broadword as PC1BW
+    import qualified HaskellWorks.Data.Bits.PopCount.PopCount1.GHC       as PC1GHC
     (fptr :: ForeignPtr Word8, offset, size) <- mmapFileForeignPtr "/Users/jky/Downloads/78mbs.json" ReadOnly Nothing
     cursor <- measure (fromForeignRegion (fptr, offset, size) :: JsonCursor BS.ByteString (BitShown (DVS.Vector Word64)) (SimpleBalancedParens (DVS.Vector Word64)))
     let !bs = BSI.fromForeignPtr (castForeignPtr fptr) offset size
