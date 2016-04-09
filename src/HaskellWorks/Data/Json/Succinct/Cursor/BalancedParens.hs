@@ -25,6 +25,7 @@ getJsonBalancedParens (JsonBalancedParens a) = a
 
 genBitWordsForever :: BS.ByteString -> Maybe (Word8, BS.ByteString)
 genBitWordsForever bs = BS.uncons bs <|> Just (0, bs)
+{-# INLINABLE genBitWordsForever #-}
 
 instance FromBlankedJson (JsonBalancedParens (SimpleBalancedParens [Bool])) where
   fromBlankedJson (BlankedJson bj) = JsonBalancedParens (SimpleBalancedParens (runListConduit blankedJsonToBalancedParens bj))
