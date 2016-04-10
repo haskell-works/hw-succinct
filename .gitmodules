@@ -1,0 +1,3 @@
+[submodule "lib/hw-bits"]
+	path = lib/hw-bits
+	url = git@github.com:haskell-works/hw-bits.git
