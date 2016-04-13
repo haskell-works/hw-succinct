@@ -13,8 +13,6 @@ import qualified Data.Vector.Storable                                as DVS
 import           Data.Word
 import           Foreign
 import           HaskellWorks.Data.Bits.BitShown
-import qualified HaskellWorks.Data.Bits.PopCount.PopCount1.Broadword as PC1BW
-import qualified HaskellWorks.Data.Bits.PopCount.PopCount1.GHC       as PC1GHC
 import           HaskellWorks.Data.Conduit.ByteString
 import           HaskellWorks.Data.Conduit.Json
 import           HaskellWorks.Data.Conduit.Json.Blank
@@ -65,8 +63,6 @@ benchRankSelect =
     [ bench "Rank - Once"   (whnf (rank1    bv) 1)
     , bench "Select - Once" (whnf (select1  bv) 1)
     , bench "Rank - Many"   (nf   (map (getCount . rank1  bv)) [0, 1000..10000000])
-    , bench "PopCnt1 Broadword - Once" (nf   (map (\n -> getCount (PC1BW.popCount1  (DVS.take n bv)))) [0, 1000..10000000])
-    , bench "PopCnt1 GHC       - Once" (nf   (map (\n -> getCount (PC1GHC.popCount1 (DVS.take n bv)))) [0, 1000..10000000])
     ]
   ]
 
