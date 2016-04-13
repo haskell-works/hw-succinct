@@ -1,4 +1,4 @@
-# hw-succinct
+# hw-bits
 [![Circle CI](https://circleci.com/gh/haskell-works/hw-succinct.svg?style=svg)](https://circleci.com/gh/haskell-works/hw-succinct)
 Conduits for tokenizing streams.
 
@@ -88,7 +88,7 @@ Run the following in the shell:
     let !bs = BSI.fromForeignPtr (castForeignPtr fptr) offset size
     x <- measure $ BS.concat $ runListConduit [bs] (blankJson =$= blankedJsonToInterestBits)
     x <- measure $ jsonBsToInterestBs bs
-    
+
     jsonTokenAt $ J.nextSibling $ J.firstChild $ J.nextSibling $ J.firstChild $ J.firstChild  cursor
 
 ## References
