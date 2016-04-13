@@ -13,5 +13,6 @@ cabal.sandbox.config
 *.prof
 *.aux
 *.hp
+*.submodules
 .stack-work/
 /3rdparty
