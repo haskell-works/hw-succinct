@@ -3,6 +3,7 @@
 
 module HaskellWorks.Data.Bits.BitReadSpec (spec) where
 
+import           GHC.Exts
 import qualified Data.Vector                    as DV
 import           Data.Word
 import           HaskellWorks.Data.Bits.BitRead
@@ -27,16 +28,16 @@ spec = describe "HaskellWorks.Data.BitReadSpec" $ do
     ws `shouldBe` Just []
   it "bitRead \"10000000 101\" :: Maybe (DV.Vector Word8)" $
     let v = bitRead "10000000 101" :: Maybe (DV.Vector Word8) in
-    v `shouldBe` Just (DV.fromList [1, 5])
+    v `shouldBe` Just (fromList [1, 5])
   it "bitRead \"11100100 10101111 1\" :: Maybe (DV.Vector Word8)" $
     let v = bitRead "11100100 10101111 1" :: Maybe (DV.Vector Word8) in
-    v `shouldBe` Just (DV.fromList [39, 245, 1])
+    v `shouldBe` Just (fromList [39, 245, 1])
   it "bitRead \"11100100 10101111 1\" :: Maybe (DV.Vector Word16)" $
     let v = bitRead "11100100 10101111 1" :: Maybe (DV.Vector Word16) in
-    v `shouldBe` Just (DV.fromList [39 + 62720, 1])
+    v `shouldBe` Just (fromList [39 + 62720, 1])
   it "bitRead \"\" :: Maybe (DV.Vector Word8)" $
     let v = bitRead "" :: Maybe (DV.Vector Word8) in
-    v `shouldBe` Just (DV.fromList [])
+    v `shouldBe` Just (fromList [])
   it "bitShow (8 :: Word8)" $
     let bs = bitShow (8 :: Word8) in
     bs `shouldBe` "00010000"

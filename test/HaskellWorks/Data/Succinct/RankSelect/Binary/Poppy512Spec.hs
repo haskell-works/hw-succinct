@@ -4,6 +4,7 @@
 
 module HaskellWorks.Data.Succinct.RankSelect.Binary.Poppy512Spec (spec) where
 
+import           GHC.Exts
 import qualified Data.Vector.Storable                                       as DVS
 import           Data.Word
 import           HaskellWorks.Data.Bits.BitShow
@@ -31,7 +32,7 @@ vectorSizedBetween :: Int -> Int -> Gen (ShowVector (DVS.Vector Word64))
 vectorSizedBetween a b = do
   n   <- choose (a, b)
   xs  <- sequence [ arbitrary | _ <- [1 .. n] ]
-  return $ ShowVector (DVS.fromList xs)
+  return $ ShowVector (fromList xs)
 
 spec :: Spec
 spec = describe "HaskellWorks.Data.Succinct.RankSelect.Binary.Poppy512.Rank1Spec" $ do
@@ -85,7 +86,7 @@ spec = describe "HaskellWorks.Data.Succinct.RankSelect.Binary.Poppy512.Rank1Spec
       let i = 0 in
       select0 v i === select0 w i
     it "on one full zero basic block" $
-      let v = DVS.fromList [0, 0, 0, 0, 0, 0, 0, 0] :: DVS.Vector Word64 in
+      let v = fromList [0, 0, 0, 0, 0, 0, 0, 0] :: DVS.Vector Word64 in
       let w = makePoppy512 v in
       select0 v 0 === select0 w 0
     it "on one basic block" $
@@ -110,7 +111,7 @@ spec = describe "HaskellWorks.Data.Succinct.RankSelect.Binary.Poppy512.Rank1Spec
       let i = 0 in
       select1 v i === select1 w i
     it "on one full zero basic block" $
-      let v = DVS.fromList [0, 0, 0, 0, 0, 0, 0, 0] :: DVS.Vector Word64 in
+      let v = fromList [0, 0, 0, 0, 0, 0, 0, 0] :: DVS.Vector Word64 in
       let w = makePoppy512 v in
       select1 v 0 === select1 w 0
     it "on one basic block" $
