@@ -1,5 +1,6 @@
 # hw-bits
-[![Circle CI](https://circleci.com/gh/haskell-works/hw-succinct.svg?style=svg)](https://circleci.com/gh/haskell-works/hw-succinct)
+[![v0.0-branch](https://circleci.com/gh/haskell-works/hw-succinct/tree/v0.0-branch.svg?style=svg)](https://circleci.com/gh/haskell-works/hw-succinct/tree/v0.0-branch)
+
 Conduits for tokenizing streams.
 
 `hw-succinct` is a succinct JSON parsing library.  It uses succinct data-structures to allow traversal of
