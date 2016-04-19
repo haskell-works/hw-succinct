@@ -9,7 +9,7 @@ import qualified Data.Attoparsec.Types                     as T
 import           Data.ByteString                           (ByteString)
 import           Data.MonoTraversable
 import           Data.Text                                 (Text)
-import           HaskellWorks.Data.Attoparsec.Final.IsChar
+import           HaskellWorks.Data.Char.IsChar
 
 class MonoTraversable t => Parser t where
   satisfy :: (Element t -> Bool) -> T.Parser t (Element t)

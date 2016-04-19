@@ -32,8 +32,7 @@ executable hw-succinct-example
 
 library
   hs-source-dirs:       src
-  exposed-modules:      HaskellWorks.Data.Attoparsec.Final.IsChar
-                      , HaskellWorks.Data.Attoparsec.Final.Parser
+  exposed-modules:      HaskellWorks.Data.Attoparsec.Final.Parser
                       , HaskellWorks.Data.Conduit.ByteString
                       , HaskellWorks.Data.Conduit.Json
                       , HaskellWorks.Data.Conduit.Json.Blank

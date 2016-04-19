@@ -18,8 +18,8 @@ import qualified Data.Attoparsec.Types                     as T
 import           Data.Bits
 import           Data.Char
 import           Data.String
-import           HaskellWorks.Data.Attoparsec.Final.IsChar
 import           HaskellWorks.Data.Attoparsec.Final.Parser as AFP
+import           HaskellWorks.Data.Char.IsChar
 import           HaskellWorks.Data.Json.Token
 
 hexDigitNumeric :: AFP.Parser t => T.Parser t Int
