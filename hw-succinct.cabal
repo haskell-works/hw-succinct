@@ -23,6 +23,7 @@ executable hw-succinct-example
                       , conduit
                       , criterion
                       , hw-bits
+                      , hw-prim
                       , hw-succinct
                       , mmap
                       , resourcet
@@ -71,6 +72,7 @@ library
                       , deepseq                         <  1.5
                       , ghc-prim
                       , hw-bits
+                      , hw-prim
                       , lens
                       , mmap
                       , mono-traversable
@@ -112,6 +114,7 @@ test-suite hw-succinct-test
                       , conduit                         >= 1.1  && < 1.3
                       , hspec                           >= 1.3
                       , hw-bits
+                      , hw-prim
                       , hw-succinct
                       , mmap
                       , parsec
@@ -137,6 +140,7 @@ benchmark bench
                       , conduit
                       , criterion
                       , hw-bits
+                      , hw-prim
                       , hw-succinct
                       , mmap
                       , resourcet
