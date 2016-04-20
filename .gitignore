@@ -15,4 +15,3 @@ cabal.sandbox.config
 *.hp
 *.submodules
 .stack-work/
-/3rdparty
