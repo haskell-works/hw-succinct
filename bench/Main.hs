@@ -3,20 +3,13 @@
 
 module Main where
 
-import           Control.Monad.Trans.Resource                        (MonadThrow)
 import           Criterion.Main
 import qualified Data.ByteString                                     as BS
 import qualified Data.ByteString.Internal                            as BSI
-import           Data.Conduit                                        (Conduit,
-                                                                      (=$=))
 import qualified Data.Vector.Storable                                as DVS
 import           Data.Word
 import           Foreign
 import           HaskellWorks.Data.Bits.BitShown
-import           HaskellWorks.Data.Conduit.ByteString
-import           HaskellWorks.Data.Conduit.Json
-import           HaskellWorks.Data.Conduit.Json.Blank
-import           HaskellWorks.Data.Conduit.List
 import           HaskellWorks.Data.FromByteString
 import           HaskellWorks.Data.Json.Succinct.Cursor
 import           HaskellWorks.Data.Positioning
@@ -45,18 +38,6 @@ setupEnvJson filepath = do
 loadJson :: BS.ByteString -> JsonCursor BS.ByteString (BitShown (DVS.Vector Word64)) (SimpleBalancedParens (DVS.Vector Word64))
 loadJson bs = fromByteString bs :: JsonCursor BS.ByteString (BitShown (DVS.Vector Word64)) (SimpleBalancedParens (DVS.Vector Word64))
 
-runCon :: Conduit i [] BS.ByteString -> i -> BS.ByteString
-runCon con bs = BS.concat $ runListConduit con [bs]
-
-runCon2 :: Conduit i [] o -> [i] -> [o]
-runCon2 con is = let os = runListConduit con is in seq (length os) os
-
-runCon3 :: Conduit i [] BS.ByteString -> [i] -> [BS.ByteString]
-runCon3 con is = let os = runListConduit con is in seq (BS.length (last os)) os
-
-jsonToInterestBits3 :: MonadThrow m => Conduit BS.ByteString m BS.ByteString
-jsonToInterestBits3 = blankJson =$= blankedJsonToInterestBits
-
 benchRankSelect :: [Benchmark]
 benchRankSelect =
   [ env (setupEnvVector 1000000) $ \bv -> bgroup "Rank"
@@ -69,9 +50,7 @@ benchRankSelect =
 benchRankJson40Conduits :: [Benchmark]
 benchRankJson40Conduits =
   [ env (setupEnvJson "/Users/jky/Downloads/part40.json") $ \bs -> bgroup "Json40"
-    [ bench "Run blankJson                    "  (whnf (runCon blankJson                  ) bs)
-    , bench "Run jsonToInterestBits3          "  (whnf (runCon jsonToInterestBits3        ) bs)
-    , bench "loadJson                         "  (whnf  loadJson                            bs)
+    [ bench "loadJson                         "  (whnf  loadJson                            bs)
     ]
   ]
 
@@ -92,16 +71,7 @@ benchRankJsonBigConduits =
 benchBlankedJsonToBalancedParens :: [Benchmark]
 benchBlankedJsonToBalancedParens =
   [ env (setupEnvJson "/Users/jky/Downloads/part40.json") $ \bs -> bgroup "JsonBig"
-    [ bench "blankedJsonToBalancedParens2" (whnf (runCon2 blankedJsonToBalancedParens) [bs])
-    , bench "blankedJsonToBalancedParens2" (whnf (runCon3 blankedJsonToBalancedParens2) [bs])
-    , bench "blankedJsonToBalancedParens2" (whnf (runCon3 (blankedJsonToBalancedParens2 =$= rechunk 4060)) [bs])
-    ]
-  ]
-
-benchRechunk :: [Benchmark]
-benchRechunk =
-  [ env (setupEnvBss 4060 19968) $ \bss -> bgroup "Rank"
-    [ bench "Rechunk"   (whnf (runListConduit (rechunk 1000)) bss)
+    [ bench "loadJson" (whnf loadJson bs)
     ]
   ]
 

@@ -33,11 +33,6 @@ executable hw-succinct-example
 library
   hs-source-dirs:       src
   exposed-modules:      HaskellWorks.Data.Attoparsec.Final.Parser
-                      , HaskellWorks.Data.Conduit.ByteString
-                      , HaskellWorks.Data.Conduit.Json
-                      , HaskellWorks.Data.Conduit.Json.Blank
-                      , HaskellWorks.Data.Conduit.Json.Words
-                      , HaskellWorks.Data.Conduit.List
                       , HaskellWorks.Data.Json.Final.Tokenize
                       , HaskellWorks.Data.Json.Final.Tokenize.Internal
                       , HaskellWorks.Data.Json.Succinct
@@ -71,6 +66,7 @@ library
                       , deepseq                         <  1.5
                       , ghc-prim
                       , hw-bits
+                      , hw-conduit
                       , hw-prim
                       , lens
                       , mmap
@@ -93,8 +89,6 @@ test-suite hw-succinct-test
   main-is:              Spec.hs
   other-modules:        HaskellWorks.Data.Bits.BitReadSpec
                       , HaskellWorks.Data.Bits.BitWiseSpec
-                      , HaskellWorks.Data.Conduit.ByteStringSpec
-                      , HaskellWorks.Data.Conduit.Json.BlankSpec
                       , HaskellWorks.Data.Json.Final.TokenizeSpec
                       , HaskellWorks.Data.Json.Succinct.CursorSpec
                       , HaskellWorks.Data.Json.Succinct.Cursor.InterestBitsSpec
@@ -113,6 +107,7 @@ test-suite hw-succinct-test
                       , conduit                         >= 1.1  && < 1.3
                       , hspec                           >= 1.3
                       , hw-bits
+                      , hw-conduit
                       , hw-prim
                       , hw-succinct
                       , mmap
