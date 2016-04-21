@@ -23,7 +23,10 @@ executable hw-succinct-example
                       , conduit
                       , criterion
                       , hw-bits
+                      , hw-conduit
+                      , hw-diagnostics
                       , hw-prim
+                      , hw-rankselect
                       , hw-succinct
                       , mmap
                       , resourcet
@@ -44,41 +47,17 @@ library
                       , HaskellWorks.Data.Json.Succinct.Cursor.Internal
                       , HaskellWorks.Data.Json.Token
                       , HaskellWorks.Data.Succinct
-                      , HaskellWorks.Data.Succinct.BalancedParens
-                      , HaskellWorks.Data.Succinct.BalancedParens.Internal
-                      , HaskellWorks.Data.Succinct.BalancedParens.Simple
-                      , HaskellWorks.Data.Succinct.NearestNeighbour
-                      , HaskellWorks.Data.Succinct.RankSelect
-                      , HaskellWorks.Data.Succinct.RankSelect.Binary
-                      , HaskellWorks.Data.Succinct.RankSelect.Binary.Basic
-                      , HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Rank0
-                      , HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Rank1
-                      , HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Select0
-                      , HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Select1
-                      , HaskellWorks.Data.Succinct.RankSelect.Binary.Poppy512
-                      , HaskellWorks.Data.Succinct.RankSelect.Internal
-                      , HaskellWorks.Diagnostics.Time
   build-depends:        base                            >= 4.7  && < 5
-                      , array
-                      , attoparsec                      >= 0.10
+                      , attoparsec
                       , bytestring
-                      , conduit                         >= 1.1  && < 1.3
-                      , deepseq                         <  1.5
-                      , ghc-prim
+                      , conduit
                       , hw-bits
                       , hw-conduit
                       , hw-prim
-                      , lens
-                      , mmap
+                      , hw-rankselect
                       , mono-traversable
-                      , parsec
-                      , QuickCheck
-                      , random
-                      , resourcet                       >= 1.1
-                      , safe
                       , text
                       , vector
-                      , word8
 
   default-language:     Haskell2010
   ghc-options:          -rtsopts -with-rtsopts=-N -Wall -O2 -Wall -msse4.2
@@ -102,18 +81,19 @@ test-suite hw-succinct-test
                       , HaskellWorks.Data.Succinct.RankSelect.InternalSpec
                       , HaskellWorks.Data.Succinct.SimpleSpec
   build-depends:        base
-                      , attoparsec                      >= 0.10
+                      , attoparsec
                       , bytestring
-                      , conduit                         >= 1.1  && < 1.3
-                      , hspec                           >= 1.3
+                      , conduit
+                      , hspec
                       , hw-bits
                       , hw-conduit
                       , hw-prim
+                      , hw-rankselect
                       , hw-succinct
                       , mmap
                       , parsec
                       , QuickCheck
-                      , resourcet                       >= 1.1
+                      , resourcet
                       , transformers
                       , vector
   ghc-options:          -threaded -rtsopts -with-rtsopts=-N -Wall
@@ -135,6 +115,7 @@ benchmark bench
                       , criterion
                       , hw-bits
                       , hw-prim
+                      , hw-rankselect
                       , hw-succinct
                       , mmap
                       , resourcet
