@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if [ "$FORCE_UPDATE" != "" ]; then
+  ./mafia > /dev/null 2> /dev/null
+  cabal update --only-dependencies
+else
+  ./mafia lock
+  ./mafia unlock
+fi
