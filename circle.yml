@@ -11,7 +11,8 @@ dependencies:
     - cp ./scripts/* ~/bin/
     - nox when deps nix-env -i ghc-7.10.3
     - nox when deps nix-env -i cabal-install-1.22.9.0
-    - nox when deps update
+    - nox when deps ./mafia lock
+    - nox when deps ./mafia unlock
     - nox when deps ./mafia install hspec-discover
     - nox when deps ln -sf ~/.ambiata/mafia/bin/hspec-discover/bin/hspec-discover ~/bin/hspec-discover
   override:
