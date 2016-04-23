@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+cmd="$1"
+
+case $cmd in
+up)
+  mkdir -p "$HOME"/.s3cache
+  for x in "$HOME"/.ambiata/mafia/packages/1/$(ghc --numeric-version)/*; do
+    echo "Packing $x"
+    mkdir -p "$(dirname $HOME/.s3cache/${x#$HOME/})"
+    tar jcf "$HOME/.s3cache/${x#$HOME/}.tar.gz" -C $(dirname $x) $(basename $x)
+  done
+  ;;
+down)
+  echo 2
+  ;;
+*)
+  "s3cache (up|down)"
+  exit 1
+  ;;
+esac
