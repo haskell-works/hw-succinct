@@ -66,20 +66,9 @@ test-suite hw-succinct-test
   type:                 exitcode-stdio-1.0
   hs-source-dirs:       test
   main-is:              Spec.hs
-  other-modules:        HaskellWorks.Data.Bits.BitReadSpec
-                      , HaskellWorks.Data.Bits.BitWiseSpec
-                      , HaskellWorks.Data.Json.Final.TokenizeSpec
+  other-modules:        HaskellWorks.Data.Json.Final.TokenizeSpec
                       , HaskellWorks.Data.Json.Succinct.CursorSpec
                       , HaskellWorks.Data.Json.Succinct.Cursor.InterestBitsSpec
-                      , HaskellWorks.Data.Succinct.BalancedParensSpec
-                      , HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Rank0Spec
-                      , HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Rank1Spec
-                      , HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Select0Spec
-                      , HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Select1Spec
-                      , HaskellWorks.Data.Succinct.RankSelect.Binary.BasicGen
-                      , HaskellWorks.Data.Succinct.RankSelect.Binary.Poppy512Spec
-                      , HaskellWorks.Data.Succinct.RankSelect.InternalSpec
-                      , HaskellWorks.Data.Succinct.SimpleSpec
   build-depends:        base
                       , attoparsec
                       , bytestring
