@@ -1,10 +1,13 @@
-{-# LANGUAGE ExplicitForAll        #-}
-{-# LANGUAGE FlexibleContexts      #-}
-{-# LANGUAGE FlexibleInstances     #-}
-{-# LANGUAGE InstanceSigs          #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings     #-}
-{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE ExplicitForAll             #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE InstanceSigs               #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE NoMonomorphismRestriction  #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
+
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 
 module HaskellWorks.Data.Json.Succinct.CursorSpec(spec) where
 
@@ -17,12 +20,13 @@ import           HaskellWorks.Data.Bits.BitShown
 import           HaskellWorks.Data.FromForeignRegion
 import           HaskellWorks.Data.Json.Succinct.Cursor                     as C
 import           HaskellWorks.Data.Json.Token
-import qualified HaskellWorks.Data.Succinct.BalancedParens.Internal         as BP
+import           HaskellWorks.Data.Succinct.BalancedParens.Internal
 import           HaskellWorks.Data.Succinct.BalancedParens.Simple
 import           HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Rank0
 import           HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Rank1
 import           HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Select1
 import           HaskellWorks.Data.Succinct.RankSelect.Binary.Poppy512
+import qualified HaskellWorks.Data.TreeCursor as TC
 import           System.IO.MMap
 import           Test.Hspec
 
@@ -30,11 +34,14 @@ import           Test.Hspec
 {-# ANN module ("HLint: ignore Reduce duplication"  :: String) #-}
 {-# ANN module ("HLint: redundant bracket"          :: String) #-}
 
+fc = TC.firstChild
+ns = TC.nextSibling
+pn = TC.parent
+cd = TC.depth
+ss = TC.subtreeSize
+
 spec :: Spec
 spec = describe "HaskellWorks.Data.Json.Succinct.CursorSpec" $ do
-  let fc = C.firstChild
-  let ns = C.nextSibling
-  let cd = C.depth
   describe "Cursor for [Bool]" $ do
     it "initialises to beginning of empty object" $ do
       let cursor = "{}" :: JsonCursor String (BitShown [Bool]) (SimpleBalancedParens [Bool])
@@ -119,17 +126,12 @@ genSpec :: forall t u.
   , Show              u
   , Rank0             u
   , Rank1             u
-  , BP.BalancedParens u
+  , BalancedParens u
   , FromForeignRegion (JsonCursor BS.ByteString t u)
   , IsString          (JsonCursor BS.ByteString t u)
   , HasJsonCursorType (JsonCursor BS.ByteString t u))
   => String -> (JsonCursor BS.ByteString t u) -> SpecWith ()
 genSpec t _ = do
-  let fc = C.firstChild
-  let ns = C.nextSibling
-  let pn = C.parent
-  let cd = C.depth
-  let ss = C.subtreeSize
   describe ("Cursor for (" ++ t ++ ")") $ do
     it "initialises to beginning of empty object" $ do
       let cursor = "{}" :: JsonCursor BS.ByteString t u
@@ -157,7 +159,7 @@ genSpec t _ = do
       jsonCursorType cursor `shouldBe` JsonCursorNull
     it "cursor can navigate to first child of array" $ do
       let cursor = "[null]" :: JsonCursor BS.ByteString t u
-      jsonCursorType (firstChild cursor) `shouldBe` JsonCursorNull
+      jsonCursorType (fc cursor) `shouldBe` JsonCursorNull
     it "cursor can navigate to second child of array" $ do
       let cursor = "[null, {\"field\": 1}]" :: JsonCursor BS.ByteString t u
       jsonCursorType ((ns . fc) cursor) `shouldBe` JsonCursorObject

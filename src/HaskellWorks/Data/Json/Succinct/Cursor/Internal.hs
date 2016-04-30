@@ -22,7 +22,10 @@ import           HaskellWorks.Data.Json.Succinct.Cursor.BlankedJson
 import           HaskellWorks.Data.Json.Succinct.Cursor.InterestBits
 import           HaskellWorks.Data.Positioning
 import           HaskellWorks.Data.Succinct.BalancedParens             as BP
+import           HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Rank0
+import           HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Rank1
 import           HaskellWorks.Data.Succinct.RankSelect.Binary.Poppy512
+import           HaskellWorks.Data.TreeCursor
 
 data JsonCursor t v w = JsonCursor
   { cursorText     :: !t
@@ -84,3 +87,18 @@ instance FromForeignRegion (JsonCursor BS.ByteString (BitShown (DVS.Vector Word6
 instance FromForeignRegion (JsonCursor BS.ByteString Poppy512 (SimpleBalancedParens (DVS.Vector Word64))) where
   fromForeignRegion (fptr, offset, size) = fromByteString (BSI.fromForeignPtr (castForeignPtr fptr) offset size)
 
+instance (BP.BalancedParens u, Rank1 u, Rank0 u) => TreeCursor (JsonCursor t v u) where
+  firstChild :: JsonCursor t v u -> JsonCursor t v u
+  firstChild k = k { cursorRank = BP.firstChild (balancedParens k) (cursorRank k) }
+
+  nextSibling :: JsonCursor t v u -> JsonCursor t v u
+  nextSibling k = k { cursorRank = BP.nextSibling (balancedParens k) (cursorRank k) }
+
+  parent :: JsonCursor t v u -> JsonCursor t v u
+  parent k = k { cursorRank = BP.parent (balancedParens k) (cursorRank k) }
+
+  depth :: JsonCursor t v u -> Count
+  depth k = BP.depth (balancedParens k) (cursorRank k)
+
+  subtreeSize :: JsonCursor t v u -> Count
+  subtreeSize k = BP.subtreeSize (balancedParens k) (cursorRank k)
