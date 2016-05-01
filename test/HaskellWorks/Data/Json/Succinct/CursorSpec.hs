@@ -17,6 +17,7 @@ import qualified Data.Vector.Storable                                       as D
 import           Data.Word
 import           HaskellWorks.Data.Bits.BitShow
 import           HaskellWorks.Data.Bits.BitShown
+import           HaskellWorks.Data.Bits.BitWise
 import           HaskellWorks.Data.FromForeignRegion
 import           HaskellWorks.Data.Json.Succinct.Cursor                     as C
 import           HaskellWorks.Data.Json.Token
@@ -126,7 +127,8 @@ genSpec :: forall t u.
   , Show              u
   , Rank0             u
   , Rank1             u
-  , BalancedParens u
+  , BalancedParens    u
+  , TestBit           u
   , FromForeignRegion (JsonCursor BS.ByteString t u)
   , IsString          (JsonCursor BS.ByteString t u)
   , HasJsonCursorType (JsonCursor BS.ByteString t u))
@@ -234,16 +236,16 @@ genSpec t _ = do
     it "can get token at cursor" $ do
       (fptr, offset, size) <- mmapFileForeignPtr "test/data/sample.json" ReadOnly Nothing
       let cursor = fromForeignRegion (fptr, offset, size) :: JsonCursor BS.ByteString t u
-      jsonTokenAt                                                              cursor  `shouldBe` JsonTokenBraceL
-      jsonTokenAt ((                                                       fc) cursor) `shouldBe` JsonTokenString "widget"
-      jsonTokenAt ((                                                  ns . fc) cursor) `shouldBe` JsonTokenBraceL
-      jsonTokenAt ((                                             fc . ns . fc) cursor) `shouldBe` JsonTokenString "debug"
-      jsonTokenAt ((                                        ns . fc . ns . fc) cursor) `shouldBe` JsonTokenString "on"
-      jsonTokenAt ((                                   ns . ns . fc . ns . fc) cursor) `shouldBe` JsonTokenString "window"
-      jsonTokenAt ((                              ns . ns . ns . fc . ns . fc) cursor) `shouldBe` JsonTokenBraceL
-      jsonTokenAt ((                         fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` JsonTokenString "title"
-      jsonTokenAt ((                    ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` JsonTokenString "Sample Konfabulator Widget"
-      jsonTokenAt ((               ns . ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` JsonTokenString "name"
-      jsonTokenAt ((          ns . ns . ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` JsonTokenString "main_window"
-      jsonTokenAt ((     ns . ns . ns . ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` JsonTokenString "width"
-      jsonTokenAt ((ns . ns . ns . ns . ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` JsonTokenNumber 500.0
+      jsonTokenAt                                                              cursor  `shouldBe` Just (JsonTokenBraceL                             )
+      jsonTokenAt ((                                                       fc) cursor) `shouldBe` Just (JsonTokenString "widget"                    )
+      jsonTokenAt ((                                                  ns . fc) cursor) `shouldBe` Just (JsonTokenBraceL                             )
+      jsonTokenAt ((                                             fc . ns . fc) cursor) `shouldBe` Just (JsonTokenString "debug"                     )
+      jsonTokenAt ((                                        ns . fc . ns . fc) cursor) `shouldBe` Just (JsonTokenString "on"                        )
+      jsonTokenAt ((                                   ns . ns . fc . ns . fc) cursor) `shouldBe` Just (JsonTokenString "window"                    )
+      jsonTokenAt ((                              ns . ns . ns . fc . ns . fc) cursor) `shouldBe` Just (JsonTokenBraceL                             )
+      jsonTokenAt ((                         fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` Just (JsonTokenString "title"                     )
+      jsonTokenAt ((                    ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` Just (JsonTokenString "Sample Konfabulator Widget")
+      jsonTokenAt ((               ns . ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` Just (JsonTokenString "name"                      )
+      jsonTokenAt ((          ns . ns . ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` Just (JsonTokenString "main_window"               )
+      jsonTokenAt ((     ns . ns . ns . ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` Just (JsonTokenString "width"                     )
+      jsonTokenAt ((ns . ns . ns . ns . ns . fc . ns . ns . ns . fc . ns . fc) cursor) `shouldBe` Just (JsonTokenNumber 500.0                       )

@@ -6,7 +6,6 @@
 module HaskellWorks.Data.Json.Succinct.Cursor
   ( module X
   , jsonTokenAt
-  , jsonTokenValid
   ) where
 
 import qualified Data.Attoparsec.ByteString.Char8                           as ABC
@@ -20,11 +19,10 @@ import           HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Rank1
 import           HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Select1
 import           HaskellWorks.Data.Vector.VectorLike
 
-jsonTokenValid :: (Rank1 w, Select1 v, TestBit w) => JsonCursor ByteString v w -> Bool
-jsonTokenValid cursor = balancedParens cursor .?. lastPositionOf (cursorRank cursor)
-
-jsonTokenAt :: (Rank1 w, Select1 v) => JsonCursor ByteString v w -> JsonToken
-jsonTokenAt k = case ABC.parse parseJsonToken (vDrop (toCount (jsonCursorPos k)) (cursorText k)) of
-  ABC.Fail    {}  -> error "Failed to parse token in cursor"
-  ABC.Partial _   -> error "Failed to parse token in cursor"
-  ABC.Done    _ r -> r
+jsonTokenAt :: (Rank1 w, Select1 v, TestBit w) => JsonCursor ByteString v w -> Maybe JsonToken
+jsonTokenAt k = if balancedParens k .?. lastPositionOf (cursorRank k)
+  then case ABC.parse parseJsonToken (vDrop (toCount (jsonCursorPos k)) (cursorText k)) of
+    ABC.Fail    {}  -> error "Failed to parse token in cursor"
+    ABC.Partial _   -> error "Failed to parse token in cursor"
+    ABC.Done    _ r -> Just r
+  else Nothing
