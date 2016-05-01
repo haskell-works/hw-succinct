@@ -36,6 +36,7 @@ executable hw-succinct-example
 library
   hs-source-dirs:       src
   exposed-modules:      HaskellWorks.Data.Attoparsec.Final.Parser
+                      , HaskellWorks.Data.Json
                       , HaskellWorks.Data.Json.Final.Tokenize
                       , HaskellWorks.Data.Json.Final.Tokenize.Internal
                       , HaskellWorks.Data.Json.Succinct
@@ -45,6 +46,7 @@ library
                       , HaskellWorks.Data.Json.Succinct.Cursor.CursorType
                       , HaskellWorks.Data.Json.Succinct.Cursor.InterestBits
                       , HaskellWorks.Data.Json.Succinct.Cursor.Internal
+                      , HaskellWorks.Data.Json.Succinct.Cursor.Token
                       , HaskellWorks.Data.Json.Token
                       , HaskellWorks.Data.Succinct
   build-depends:        base                            >= 4.7  && < 5
