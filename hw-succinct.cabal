@@ -1,5 +1,5 @@
 name:                   hw-succinct
-version:                0.0.0.10
+version:                0.0.0.11
 synopsis:               Conduits for tokenizing streams.
 description:            Please see README.md
 homepage:               http://github.com/haskell-works/hw-succinct#readme
@@ -37,8 +37,6 @@ library
   hs-source-dirs:       src
   exposed-modules:      HaskellWorks.Data.Attoparsec.Final.Parser
                       , HaskellWorks.Data.Json
-                      , HaskellWorks.Data.Json.Final.Tokenize
-                      , HaskellWorks.Data.Json.Final.Tokenize.Internal
                       , HaskellWorks.Data.Json.Succinct
                       , HaskellWorks.Data.Json.Succinct.Cursor
                       , HaskellWorks.Data.Json.Succinct.Cursor.BalancedParens
@@ -47,6 +45,8 @@ library
                       , HaskellWorks.Data.Json.Succinct.Cursor.InterestBits
                       , HaskellWorks.Data.Json.Succinct.Cursor.Internal
                       , HaskellWorks.Data.Json.Succinct.Cursor.Token
+                      , HaskellWorks.Data.Json.Token.Tokenize
+                      , HaskellWorks.Data.Json.Token.Types
                       , HaskellWorks.Data.Json.Token
                       , HaskellWorks.Data.Succinct
   build-depends:        base                            >= 4.7  && < 5
@@ -68,7 +68,7 @@ test-suite hw-succinct-test
   type:                 exitcode-stdio-1.0
   hs-source-dirs:       test
   main-is:              Spec.hs
-  other-modules:        HaskellWorks.Data.Json.Final.TokenizeSpec
+  other-modules:        HaskellWorks.Data.Json.Token.TokenizeSpec
                       , HaskellWorks.Data.Json.Succinct.CursorSpec
                       , HaskellWorks.Data.Json.Succinct.Cursor.InterestBitsSpec
   build-depends:        base

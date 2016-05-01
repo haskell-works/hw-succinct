@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module HaskellWorks.Data.Json.Final.Tokenize.Internal
+module HaskellWorks.Data.Json.Token.Tokenize
     ( IsChar(..)
     , JsonToken(..)
     , AFP.Parser(..)
@@ -20,7 +20,7 @@ import           Data.Char
 import           Data.String
 import           HaskellWorks.Data.Attoparsec.Final.Parser as AFP
 import           HaskellWorks.Data.Char.IsChar
-import           HaskellWorks.Data.Json.Token
+import           HaskellWorks.Data.Json.Token.Types
 
 hexDigitNumeric :: AFP.Parser t => T.Parser t Int
 hexDigitNumeric = do

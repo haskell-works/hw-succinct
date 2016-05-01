@@ -1,11 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module HaskellWorks.Data.Json.Final.TokenizeSpec (spec) where
+module HaskellWorks.Data.Json.Token.TokenizeSpec (spec) where
 
 import qualified Data.Attoparsec.ByteString.Char8      as BC
 import           Data.ByteString                       as BS
-import           HaskellWorks.Data.Json.Final.Tokenize
-import           HaskellWorks.Data.Json.Token
+import           HaskellWorks.Data.Json.Token.Tokenize
 import           Test.Hspec
 
 {-# ANN module ("HLint: ignore Redundant do"        :: String) #-}
