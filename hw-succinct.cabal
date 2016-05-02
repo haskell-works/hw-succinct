@@ -1,5 +1,5 @@
 name:                   hw-succinct
-version:                0.0.0.11
+version:                0.0.0.12
 synopsis:               Conduits for tokenizing streams.
 description:            Please see README.md
 homepage:               http://github.com/haskell-works/hw-succinct#readme
@@ -35,8 +35,7 @@ executable hw-succinct-example
 
 library
   hs-source-dirs:       src
-  exposed-modules:      HaskellWorks.Data.Attoparsec.Final.Parser
-                      , HaskellWorks.Data.Json
+  exposed-modules:      HaskellWorks.Data.Json
                       , HaskellWorks.Data.Json.Succinct
                       , HaskellWorks.Data.Json.Succinct.Cursor
                       , HaskellWorks.Data.Json.Succinct.Cursor.BalancedParens
@@ -55,6 +54,7 @@ library
                       , conduit
                       , hw-bits
                       , hw-conduit
+                      , hw-parser
                       , hw-prim
                       , hw-rankselect
                       , mono-traversable
