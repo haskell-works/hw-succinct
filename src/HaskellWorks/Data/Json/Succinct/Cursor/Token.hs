@@ -14,7 +14,7 @@ import           HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Rank1
 import           HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Select1
 import           HaskellWorks.Data.Vector.VectorLike
 
-jsonTokenAt :: (Rank1 w, Select1 v, TestBit w) => JsonCursor ByteString v w -> Maybe JsonToken
+jsonTokenAt :: (Rank1 w, Select1 v, TestBit w) => JsonCursor ByteString v w -> Maybe (JsonToken String Double)
 jsonTokenAt k = if balancedParens k .?. lastPositionOf (cursorRank k)
   then case ABC.parse parseJsonToken (vDrop (toCount (jsonCursorPos k)) (cursorText k)) of
     ABC.Fail    {}  -> error "Failed to parse token in cursor"

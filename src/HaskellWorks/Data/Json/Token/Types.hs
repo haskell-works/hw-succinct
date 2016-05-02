@@ -1,6 +1,6 @@
 module HaskellWorks.Data.Json.Token.Types (JsonToken(..)) where
 
-data JsonToken
+data JsonToken s d
   = JsonTokenBraceL
   | JsonTokenBraceR
   | JsonTokenBracketL
@@ -8,8 +8,8 @@ data JsonToken
   | JsonTokenComma
   | JsonTokenColon
   | JsonTokenWhitespace
-  | JsonTokenString String
+  | JsonTokenString s
   | JsonTokenBoolean Bool
-  | JsonTokenNumber Double
+  | JsonTokenNumber d
   | JsonTokenNull
   deriving (Eq, Show)

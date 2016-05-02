@@ -9,7 +9,7 @@ import           Test.Hspec
 
 {-# ANN module ("HLint: ignore Redundant do"        :: String) #-}
 
-parseJsonToken' :: ByteString -> Either String JsonToken
+parseJsonToken' :: ByteString -> Either String (JsonToken String Double)
 parseJsonToken' = BC.parseOnly parseJsonToken
 
 spec :: Spec
