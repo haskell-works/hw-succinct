@@ -7,9 +7,7 @@
 module HaskellWorks.Data.Json.Token.Tokenize
     ( IsChar(..)
     , JsonToken(..)
-    , parseJsonToken
-    , parseJsonTokenString
-    , escapedChar
+    , ParseJson(..)
     ) where
 
 import           Control.Applicative
@@ -19,7 +17,6 @@ import qualified Data.Attoparsec.Types              as T
 import qualified Data.ByteString                    as BS
 import           Data.Bits
 import           Data.Char
-import           Data.String
 import           HaskellWorks.Data.Parser           as P
 import           HaskellWorks.Data.Char.IsChar
 import           HaskellWorks.Data.Json.Token.Types
@@ -42,31 +39,6 @@ hexDigitAlphaUpper = do
 hexDigit :: P.Parser t => T.Parser t Int
 hexDigit = hexDigitNumeric <|> hexDigitAlphaLower <|> hexDigitAlphaUpper
 
-verbatimChar :: P.Parser t => T.Parser t Char
-verbatimChar  = satisfyChar (BC.notInClass "\"\\") <?> "invalid string character"
-
-escapedChar :: (IsString t, P.Parser t) => T.Parser t Char
-escapedChar   = do
-  _ <- string "\\"
-  (   char '"'  >> return '"'  ) <|>
-    ( char 'b'  >> return '\b' ) <|>
-    ( char 'n'  >> return '\n' ) <|>
-    ( char 'f'  >> return '\f' ) <|>
-    ( char 'r'  >> return '\r' ) <|>
-    ( char 't'  >> return '\t' ) <|>
-    ( char '\\' >> return '\\' ) <|>
-    ( char '\'' >> return '\'' ) <|>
-    ( char '/'  >> return '/'  )
-
-escapedCode :: (IsString t, P.Parser t) => T.Parser t Char
-escapedCode   = do
-  _ <- string "\\u"
-  a <- hexDigit
-  b <- hexDigit
-  c <- hexDigit
-  d <- hexDigit
-  return $ chr $ a `shift` 24 .|. b `shift` 16 .|. c `shift` 8 .|. d
-
 class ParseJson t s d where
   parseJsonTokenString :: T.Parser t (JsonToken s d)
   parseJsonToken :: T.Parser t (JsonToken s d)
@@ -80,6 +52,7 @@ class ParseJson t s d where
   parseJsonTokenNull :: T.Parser t (JsonToken s d)
   parseJsonTokenBoolean :: T.Parser t (JsonToken s d)
   parseJsonTokenDouble :: T.Parser t (JsonToken s d)
+
   parseJsonToken =
     parseJsonTokenString     <|>
     parseJsonTokenBraceL     <|>
@@ -108,6 +81,26 @@ instance ParseJson BS.ByteString String Double where
     value <- many (verbatimChar <|> escapedChar <|> escapedCode)
     _ <- string "\""
     return $ JsonTokenString value
+    where
+      verbatimChar  = satisfyChar (BC.notInClass "\"\\") <?> "invalid string character"
+      escapedChar   = do
+        _ <- string "\\"
+        (   char '"'  >> return '"'  ) <|>
+          ( char 'b'  >> return '\b' ) <|>
+          ( char 'n'  >> return '\n' ) <|>
+          ( char 'f'  >> return '\f' ) <|>
+          ( char 'r'  >> return '\r' ) <|>
+          ( char 't'  >> return '\t' ) <|>
+          ( char '\\' >> return '\\' ) <|>
+          ( char '\'' >> return '\'' ) <|>
+          ( char '/'  >> return '/'  )
+      escapedCode   = do
+        _ <- string "\\u"
+        a <- hexDigit
+        b <- hexDigit
+        c <- hexDigit
+        d <- hexDigit
+        return $ chr $ a `shift` 24 .|. b `shift` 16 .|. c `shift` 8 .|. d
 
   parseJsonTokenWhitespace = do
     _ <- AC.many1' $ BC.choice [string " ", string "\t", string "\n", string "\r"]
