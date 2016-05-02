@@ -1,5 +1,8 @@
-{-# LANGUAGE FlexibleContexts  #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts       #-}
+{-# LANGUAGE FlexibleInstances      #-}
+{-# LANGUAGE MultiParamTypeClasses  #-}
+{-# LANGUAGE OverloadedStrings      #-}
+{-# LANGUAGE TypeSynonymInstances   #-}
 
 module HaskellWorks.Data.Json.Token.Tokenize
     ( IsChar(..)
@@ -64,19 +67,19 @@ escapedCode   = do
   d <- hexDigit
   return $ chr $ a `shift` 24 .|. b `shift` 16 .|. c `shift` 8 .|. d
 
-class ParseJson t where
-  parseJsonTokenString :: T.Parser t (JsonToken String Double)
-  parseJsonToken :: T.Parser t (JsonToken String Double)
-  parseJsonTokenBraceL :: T.Parser t (JsonToken String Double)
-  parseJsonTokenBraceR :: T.Parser t (JsonToken String Double)
-  parseJsonTokenBracketL :: T.Parser t (JsonToken String Double)
-  parseJsonTokenBracketR :: T.Parser t (JsonToken String Double)
-  parseJsonTokenComma :: T.Parser t (JsonToken String Double)
-  parseJsonTokenColon :: T.Parser t (JsonToken String Double)
-  parseJsonTokenWhitespace :: T.Parser t (JsonToken String Double)
-  parseJsonTokenNull :: T.Parser t (JsonToken String Double)
-  parseJsonTokenBoolean :: T.Parser t (JsonToken String Double)
-  parseJsonTokenDouble :: T.Parser t (JsonToken String Double)
+class ParseJson t s d where
+  parseJsonTokenString :: T.Parser t (JsonToken s d)
+  parseJsonToken :: T.Parser t (JsonToken s d)
+  parseJsonTokenBraceL :: T.Parser t (JsonToken s d)
+  parseJsonTokenBraceR :: T.Parser t (JsonToken s d)
+  parseJsonTokenBracketL :: T.Parser t (JsonToken s d)
+  parseJsonTokenBracketR :: T.Parser t (JsonToken s d)
+  parseJsonTokenComma :: T.Parser t (JsonToken s d)
+  parseJsonTokenColon :: T.Parser t (JsonToken s d)
+  parseJsonTokenWhitespace :: T.Parser t (JsonToken s d)
+  parseJsonTokenNull :: T.Parser t (JsonToken s d)
+  parseJsonTokenBoolean :: T.Parser t (JsonToken s d)
+  parseJsonTokenDouble :: T.Parser t (JsonToken s d)
   parseJsonToken =
     parseJsonTokenString     <|>
     parseJsonTokenBraceL     <|>
@@ -90,7 +93,7 @@ class ParseJson t where
     parseJsonTokenBoolean    <|>
     parseJsonTokenDouble
 
-instance ParseJson BS.ByteString where
+instance ParseJson BS.ByteString String Double where
   parseJsonTokenBraceL = string "{" >> return JsonTokenBraceL
   parseJsonTokenBraceR = string "}" >> return JsonTokenBraceR
   parseJsonTokenBracketL = string "[" >> return JsonTokenBracketL
