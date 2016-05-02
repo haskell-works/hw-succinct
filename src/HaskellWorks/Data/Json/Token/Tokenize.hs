@@ -13,6 +13,7 @@ import           Control.Applicative
 import qualified Data.Attoparsec.ByteString.Char8   as BC
 import qualified Data.Attoparsec.Combinator         as AC
 import qualified Data.Attoparsec.Types              as T
+import qualified Data.ByteString                    as BS
 import           Data.Bits
 import           Data.Char
 import           Data.String
@@ -63,58 +64,60 @@ escapedCode   = do
   d <- hexDigit
   return $ chr $ a `shift` 24 .|. b `shift` 16 .|. c `shift` 8 .|. d
 
-parseJsonTokenString :: (P.Parser t, Alternative (T.Parser t), IsString t) => T.Parser t JsonToken
-parseJsonTokenString = do
-  _ <- string "\""
-  value <- many (verbatimChar <|> escapedChar <|> escapedCode)
-  _ <- string "\""
-  return $ JsonTokenString value
+class ParseJson t where
+  parseJsonTokenString :: T.Parser t JsonToken
+  parseJsonToken :: T.Parser t JsonToken
+  parseJsonTokenBraceL :: T.Parser t JsonToken
+  parseJsonTokenBraceR :: T.Parser t JsonToken
+  parseJsonTokenBracketL :: T.Parser t JsonToken
+  parseJsonTokenBracketR :: T.Parser t JsonToken
+  parseJsonTokenComma :: T.Parser t JsonToken
+  parseJsonTokenColon :: T.Parser t JsonToken
+  parseJsonTokenWhitespace :: T.Parser t JsonToken
+  parseJsonTokenNull :: T.Parser t JsonToken
+  parseJsonTokenBoolean :: T.Parser t JsonToken
+  parseJsonTokenDouble :: T.Parser t JsonToken
+  parseJsonToken =
+    parseJsonTokenString     <|>
+    parseJsonTokenBraceL     <|>
+    parseJsonTokenBraceR     <|>
+    parseJsonTokenBracketL   <|>
+    parseJsonTokenBracketR   <|>
+    parseJsonTokenComma      <|>
+    parseJsonTokenColon      <|>
+    parseJsonTokenWhitespace <|>
+    parseJsonTokenNull       <|>
+    parseJsonTokenBoolean    <|>
+    parseJsonTokenDouble
 
-parseJsonTokenBraceL :: (P.Parser t, IsString t) => T.Parser t JsonToken
-parseJsonTokenBraceL = string "{" >> return JsonTokenBraceL
+instance ParseJson BS.ByteString where
+  parseJsonTokenString = do
+    _ <- string "\""
+    value <- many (verbatimChar <|> escapedChar <|> escapedCode)
+    _ <- string "\""
+    return $ JsonTokenString value
 
-parseJsonTokenBraceR :: (P.Parser t, IsString t) => T.Parser t JsonToken
-parseJsonTokenBraceR = string "}" >> return JsonTokenBraceR
+  parseJsonTokenBraceL = string "{" >> return JsonTokenBraceL
 
-parseJsonTokenBracketL :: (P.Parser t, IsString t) => T.Parser t JsonToken
-parseJsonTokenBracketL = string "[" >> return JsonTokenBracketL
+  parseJsonTokenBraceR = string "}" >> return JsonTokenBraceR
 
-parseJsonTokenBracketR :: (P.Parser t, IsString t) => T.Parser t JsonToken
-parseJsonTokenBracketR = string "]" >> return JsonTokenBracketR
+  parseJsonTokenBracketL = string "[" >> return JsonTokenBracketL
 
-parseJsonTokenComma :: (P.Parser t, IsString t) => T.Parser t JsonToken
-parseJsonTokenComma = string "," >> return JsonTokenComma
+  parseJsonTokenBracketR = string "]" >> return JsonTokenBracketR
 
-parseJsonTokenColon :: (P.Parser t, IsString t) => T.Parser t JsonToken
-parseJsonTokenColon = string ":" >> return JsonTokenColon
+  parseJsonTokenComma = string "," >> return JsonTokenComma
 
-parseJsonTokenWhitespace :: (P.Parser t, IsString t) => T.Parser t JsonToken
-parseJsonTokenWhitespace = do
-  _ <- AC.many1' $ BC.choice [string " ", string "\t", string "\n", string "\r"]
-  return JsonTokenWhitespace
+  parseJsonTokenColon = string ":" >> return JsonTokenColon
 
-parseJsonTokenNull :: (P.Parser t, IsString t) => T.Parser t JsonToken
-parseJsonTokenNull = string "null" >> return JsonTokenNull
+  parseJsonTokenWhitespace = do
+    _ <- AC.many1' $ BC.choice [string " ", string "\t", string "\n", string "\r"]
+    return JsonTokenWhitespace
 
-parseJsonTokenBoolean :: (P.Parser t, IsString t) => T.Parser t JsonToken
-parseJsonTokenBoolean = true <|> false
-  where
-    true  = string "true"   >> return (JsonTokenBoolean True)
-    false = string "false"  >> return (JsonTokenBoolean False)
+  parseJsonTokenNull = string "null" >> return JsonTokenNull
 
-parseJsonTokenDouble :: (P.Parser t, IsString t) => T.Parser t JsonToken
-parseJsonTokenDouble = JsonTokenNumber <$> rational
+  parseJsonTokenBoolean = true <|> false
+    where
+      true  = string "true"   >> return (JsonTokenBoolean True)
+      false = string "false"  >> return (JsonTokenBoolean False)
 
-parseJsonToken :: (P.Parser t, IsString t) => T.Parser t JsonToken
-parseJsonToken =
-  parseJsonTokenString     <|>
-  parseJsonTokenBraceL     <|>
-  parseJsonTokenBraceR     <|>
-  parseJsonTokenBracketL   <|>
-  parseJsonTokenBracketR   <|>
-  parseJsonTokenComma      <|>
-  parseJsonTokenColon      <|>
-  parseJsonTokenWhitespace <|>
-  parseJsonTokenNull       <|>
-  parseJsonTokenBoolean    <|>
-  parseJsonTokenDouble
+  parseJsonTokenDouble = JsonTokenNumber <$> rational
