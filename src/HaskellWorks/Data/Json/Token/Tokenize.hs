@@ -17,9 +17,11 @@ import qualified Data.Attoparsec.Types              as T
 import qualified Data.ByteString                    as BS
 import           Data.Bits
 import           Data.Char
-import           HaskellWorks.Data.Parser           as P
+import           Data.Word
 import           HaskellWorks.Data.Char.IsChar
+import           HaskellWorks.Data.Conduit.Json.Words
 import           HaskellWorks.Data.Json.Token.Types
+import           HaskellWorks.Data.Parser           as P
 
 hexDigitNumeric :: P.Parser t => T.Parser t Int
 hexDigitNumeric = do
@@ -101,6 +103,56 @@ instance ParseJson BS.ByteString String Double where
         c <- hexDigit
         d <- hexDigit
         return $ chr $ a `shift` 24 .|. b `shift` 16 .|. c `shift` 8 .|. d
+
+  parseJsonTokenWhitespace = do
+    _ <- AC.many1' $ BC.choice [string " ", string "\t", string "\n", string "\r"]
+    return JsonTokenWhitespace
+
+  parseJsonTokenBoolean = true <|> false
+    where
+      true  = string "true"   >> return (JsonTokenBoolean True)
+      false = string "false"  >> return (JsonTokenBoolean False)
+
+instance ParseJson BS.ByteString BS.ByteString Double where
+  parseJsonTokenBraceL = string "{" >> return JsonTokenBraceL
+  parseJsonTokenBraceR = string "}" >> return JsonTokenBraceR
+  parseJsonTokenBracketL = string "[" >> return JsonTokenBracketL
+  parseJsonTokenBracketR = string "]" >> return JsonTokenBracketR
+  parseJsonTokenComma = string "," >> return JsonTokenComma
+  parseJsonTokenColon = string ":" >> return JsonTokenColon
+  parseJsonTokenNull = string "null" >> return JsonTokenNull
+  parseJsonTokenDouble = JsonTokenNumber <$> rational
+
+  parseJsonTokenString = do
+    _ <- string "\""
+    value <- many (verbatimChar <|> escapedChar <|> escapedCode)
+    _ <- string "\""
+    return $ JsonTokenString $ BS.pack value
+    where
+      word :: Word8 -> T.Parser BS.ByteString Word8
+      word w = satisfy (== w)
+      verbatimChar :: T.Parser BS.ByteString Word8
+      verbatimChar  = satisfy (\w -> w /= wDoubleQuote && w /= wBackslash) -- <?> "invalid string character"
+      escapedChar :: T.Parser BS.ByteString Word8
+      escapedChar   = do
+        _ <- string "\\"
+        (   word wDoubleQuote >> return wDoubleQuote    ) <|>
+          ( word wb           >> return wBackspace      ) <|>
+          ( word wn           >> return wNewline        ) <|>
+          ( word wf           >> return wLinefeed       ) <|>
+          ( word wr           >> return wCarriageReturn ) <|>
+          ( word wt           >> return wTab            ) <|>
+          ( word wBackslash   >> return wBackslash      ) <|>
+          ( word wQuote       >> return wQuote          ) <|>
+          ( word wSlash       >> return wSlash          )
+      escapedCode :: T.Parser BS.ByteString Word8
+      escapedCode   = do
+        _ <- string "\\u"
+        a <- hexDigit
+        b <- hexDigit
+        c <- hexDigit
+        d <- hexDigit
+        return $ fromIntegral $ a `shift` 24 .|. b `shift` 16 .|. c `shift` 8 .|. d
 
   parseJsonTokenWhitespace = do
     _ <- AC.many1' $ BC.choice [string " ", string "\t", string "\n", string "\r"]
