@@ -1,12 +1,12 @@
 module HaskellWorks.Data.Json.Type where
 
 data JsonType
-  = JsonTypeString
+  = JsonTypeArray
+  | JsonTypeBool
+  | JsonTypeNull
   | JsonTypeNumber
   | JsonTypeObject
-  | JsonTypeArray
-  | JsonTypeBool
-  | JsonTypeNul
+  | JsonTypeString
 
 class JsonTypeAt a where
-  jsonTypeAt :: a -> JsonType
+  jsonTypeAt :: a -> Maybe JsonType

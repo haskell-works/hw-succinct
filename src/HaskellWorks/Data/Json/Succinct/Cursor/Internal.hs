@@ -15,17 +15,21 @@ import qualified Data.Vector.Storable                                  as DVS
 import           Data.Word
 import           Foreign.ForeignPtr
 import           HaskellWorks.Data.Bits.BitShown
+import           HaskellWorks.Data.Bits.BitWise
+import           HaskellWorks.Data.Conduit.Json.Words
 import           HaskellWorks.Data.FromByteString
 import           HaskellWorks.Data.FromForeignRegion
 import           HaskellWorks.Data.Json.Succinct.Cursor.BalancedParens
 import           HaskellWorks.Data.Json.Succinct.Cursor.BlankedJson
 import           HaskellWorks.Data.Json.Succinct.Cursor.InterestBits
+import           HaskellWorks.Data.Json.Type
 import           HaskellWorks.Data.Positioning
 import           HaskellWorks.Data.Succinct.BalancedParens             as BP
 import           HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Rank0
 import           HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Rank1
 import           HaskellWorks.Data.Succinct.RankSelect.Binary.Poppy512
 import           HaskellWorks.Data.TreeCursor
+import           HaskellWorks.Data.Vector.VectorLike
 
 data JsonCursor t v w = JsonCursor
   { cursorText     :: !t
@@ -102,3 +106,20 @@ instance (BP.BalancedParens u, Rank1 u, Rank0 u) => TreeCursor (JsonCursor t v u
 
   subtreeSize :: JsonCursor t v u -> Count
   subtreeSize k = BP.subtreeSize (balancedParens k) (cursorRank k)
+
+wIsJsonNumberDigit :: Word8 -> Bool
+wIsJsonNumberDigit w = (w >= w0 && w <= w9) || w == wMinus
+
+instance TestBit w => JsonTypeAt (JsonCursor BS.ByteString v w) where
+  jsonTypeAt :: JsonCursor BS.ByteString v w -> Maybe JsonType
+  jsonTypeAt k = if balancedParens k .?. p
+    then case cursorText k !!! p of
+      c | c == wOpenBracket     -> Just JsonTypeArray
+      c | c == wt               -> Just JsonTypeBool
+      c | c == wn               -> Just JsonTypeNull
+      c | wIsJsonNumberDigit c  -> Just JsonTypeNumber
+      c | c == wOpenBrace       -> Just JsonTypeObject
+      c | c == wDoubleQuote     -> Just JsonTypeString
+      _                         -> Nothing
+    else Nothing
+    where p = lastPositionOf (cursorRank k)
