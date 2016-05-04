@@ -23,6 +23,7 @@ import           HaskellWorks.Data.Json.Succinct.Cursor.BalancedParens
 import           HaskellWorks.Data.Json.Succinct.Cursor.BlankedJson
 import           HaskellWorks.Data.Json.Succinct.Cursor.InterestBits
 import           HaskellWorks.Data.Json.Type
+import           HaskellWorks.Data.Json.Value
 import           HaskellWorks.Data.Positioning
 import           HaskellWorks.Data.Succinct.BalancedParens             as BP
 import           HaskellWorks.Data.Succinct.RankSelect.Binary.Basic.Rank0
@@ -111,8 +112,7 @@ wIsJsonNumberDigit :: Word8 -> Bool
 wIsJsonNumberDigit w = (w >= w0 && w <= w9) || w == wMinus
 
 instance TestBit w => JsonTypeAt (JsonCursor BS.ByteString v w) where
-  jsonTypeAt :: JsonCursor BS.ByteString v w -> Maybe JsonType
-  jsonTypeAt k = if balancedParens k .?. p
+  jsonTypeAtPosition p k = if balancedParens k .?. p
     then case cursorText k !!! p of
       c | c == wOpenBracket     -> Just JsonTypeArray
       c | c == wt               -> Just JsonTypeBool
@@ -122,4 +122,20 @@ instance TestBit w => JsonTypeAt (JsonCursor BS.ByteString v w) where
       c | c == wDoubleQuote     -> Just JsonTypeString
       _                         -> Nothing
     else Nothing
+
+  jsonTypeAt k = jsonTypeAtPosition (lastPositionOf (cursorRank k)) k
+
+instance TestBit w => JsonValueAt BS.ByteString BS.ByteString (JsonCursor BS.ByteString v w) where
+  jsonValueAt :: JsonCursor BS.ByteString v w -> Maybe (JsonValue BS.ByteString BS.ByteString)
+  jsonValueAt k = case jsonTypeAtPosition p k of
+    Just JsonTypeArray  -> error "Not Implemented"
+    Just JsonTypeBool   -> case cursorText k !!! p of
+      c | c == wt -> Just $ JsonBool True
+      c | c == wt -> Just $ JsonBool False
+      _           -> Nothing
+    Just JsonTypeNull   -> Just JsonNull
+    Just JsonTypeNumber -> error "Not Implemented"
+    Just JsonTypeObject -> error "Not Implemented"
+    Just JsonTypeString -> error "Not Implemented"
+    Nothing             -> Nothing
     where p = lastPositionOf (cursorRank k)

@@ -1,5 +1,7 @@
 module HaskellWorks.Data.Json.Type where
 
+import HaskellWorks.Data.Positioning
+
 data JsonType
   = JsonTypeArray
   | JsonTypeBool
@@ -9,4 +11,5 @@ data JsonType
   | JsonTypeString
 
 class JsonTypeAt a where
+  jsonTypeAtPosition :: Position -> a -> Maybe JsonType
   jsonTypeAt :: a -> Maybe JsonType

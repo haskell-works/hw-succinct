@@ -1,3 +1,5 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+
 module HaskellWorks.Data.Json.Value where
 
 import Data.Map
@@ -9,3 +11,6 @@ data JsonValue s n
   | JsonArray [JsonValue s n]
   | JsonBool Bool
   | JsonNull
+
+class JsonValueAt s n a where
+  jsonValueAt :: a -> Maybe (JsonValue s n)
