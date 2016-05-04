@@ -48,6 +48,7 @@ library
                       , HaskellWorks.Data.Json.Token.Tokenize
                       , HaskellWorks.Data.Json.Token.Types
                       , HaskellWorks.Data.Json.Token
+                      , HaskellWorks.Data.Json.Type
                       , HaskellWorks.Data.Json.Value
                       , HaskellWorks.Data.Succinct
   build-depends:        base                            >= 4.7  && < 5
