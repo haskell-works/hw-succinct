@@ -13,10 +13,10 @@ import           Data.ByteString.Internal                              as BSI
 import           Data.String
 import qualified Data.Vector.Storable                                  as DVS
 import           Data.Word
+import           Data.Word8
 import           Foreign.ForeignPtr
 import           HaskellWorks.Data.Bits.BitShown
 import           HaskellWorks.Data.Bits.BitWise
-import           HaskellWorks.Data.Conduit.Json.Words
 import           HaskellWorks.Data.FromByteString
 import           HaskellWorks.Data.FromForeignRegion
 import           HaskellWorks.Data.Json.Succinct.Cursor.BalancedParens
@@ -109,17 +109,17 @@ instance (BP.BalancedParens u, Rank1 u, Rank0 u) => TreeCursor (JsonCursor t v u
   subtreeSize k = BP.subtreeSize (balancedParens k) (cursorRank k)
 
 wIsJsonNumberDigit :: Word8 -> Bool
-wIsJsonNumberDigit w = (w >= w0 && w <= w9) || w == wMinus
+wIsJsonNumberDigit w = (w >= _0 && w <= _9) || w == _hyphen
 
 instance TestBit w => JsonTypeAt (JsonCursor BS.ByteString v w) where
   jsonTypeAtPosition p k = if balancedParens k .?. p
     then case cursorText k !!! p of
-      c | c == wOpenBracket     -> Just JsonTypeArray
-      c | c == wt               -> Just JsonTypeBool
-      c | c == wn               -> Just JsonTypeNull
+      c | c == _bracketleft     -> Just JsonTypeArray
+      c | c == _t               -> Just JsonTypeBool
+      c | c == _n               -> Just JsonTypeNull
       c | wIsJsonNumberDigit c  -> Just JsonTypeNumber
-      c | c == wOpenBrace       -> Just JsonTypeObject
-      c | c == wDoubleQuote     -> Just JsonTypeString
+      c | c == _braceleft       -> Just JsonTypeObject
+      c | c == _quotedbl        -> Just JsonTypeString
       _                         -> Nothing
     else Nothing
 
@@ -130,8 +130,8 @@ instance TestBit w => JsonValueAt BS.ByteString BS.ByteString (JsonCursor BS.Byt
   jsonValueAt k = case jsonTypeAtPosition p k of
     Just JsonTypeArray  -> error "Not Implemented"
     Just JsonTypeBool   -> case cursorText k !!! p of
-      c | c == wt -> Just $ JsonBool True
-      c | c == wt -> Just $ JsonBool False
+      c | c == _t -> Just $ JsonBool True
+      c | c == _t -> Just $ JsonBool False
       _           -> Nothing
     Just JsonTypeNull   -> Just JsonNull
     Just JsonTypeNumber -> error "Not Implemented"
