@@ -18,8 +18,8 @@ import qualified Data.ByteString                    as BS
 import           Data.Bits
 import           Data.Char
 import           Data.Word
+import           Data.Word8
 import           HaskellWorks.Data.Char.IsChar
-import           HaskellWorks.Data.Conduit.Json.Words
 import           HaskellWorks.Data.Json.Token.Types
 import           HaskellWorks.Data.Parser           as P
 
@@ -132,19 +132,19 @@ instance ParseJson BS.ByteString BS.ByteString Double where
       word :: Word8 -> T.Parser BS.ByteString Word8
       word w = satisfy (== w)
       verbatimChar :: T.Parser BS.ByteString Word8
-      verbatimChar  = satisfy (\w -> w /= wDoubleQuote && w /= wBackslash) -- <?> "invalid string character"
+      verbatimChar  = satisfy (\w -> w /= _quotedbl && w /= _backslash) -- <?> "invalid string character"
       escapedChar :: T.Parser BS.ByteString Word8
       escapedChar   = do
         _ <- string "\\"
-        (   word wDoubleQuote >> return wDoubleQuote    ) <|>
-          ( word wb           >> return wBackspace      ) <|>
-          ( word wn           >> return wNewline        ) <|>
-          ( word wf           >> return wLinefeed       ) <|>
-          ( word wr           >> return wCarriageReturn ) <|>
-          ( word wt           >> return wTab            ) <|>
-          ( word wBackslash   >> return wBackslash      ) <|>
-          ( word wQuote       >> return wQuote          ) <|>
-          ( word wSlash       >> return wSlash          )
+        (   word _quotedbl    >> return _quotedbl       ) <|>
+          ( word _b           >> return 0x08            ) <|>
+          ( word _n           >> return _lf             ) <|>
+          ( word _f           >> return _np             ) <|>
+          ( word _r           >> return _cr             ) <|>
+          ( word _t           >> return _tab            ) <|>
+          ( word _backslash   >> return _backslash      ) <|>
+          ( word _quotesingle >> return _quotesingle    ) <|>
+          ( word _slash       >> return _slash          )
       escapedCode :: T.Parser BS.ByteString Word8
       escapedCode   = do
         _ <- string "\\u"
