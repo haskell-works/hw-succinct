@@ -9,6 +9,7 @@ data JsonType
   | JsonTypeNumber
   | JsonTypeObject
   | JsonTypeString
+  deriving (Eq, Show)
 
 class JsonTypeAt a where
   jsonTypeAtPosition :: Position -> a -> Maybe JsonType

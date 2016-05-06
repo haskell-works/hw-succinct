@@ -11,6 +11,7 @@ data JsonValue s n
   | JsonArray [JsonValue s n]
   | JsonBool Bool
   | JsonNull
+  deriving (Eq, Show)
 
 class JsonValueAt s n a where
   jsonValueAt :: a -> Maybe (JsonValue s n)

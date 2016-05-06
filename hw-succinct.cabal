@@ -36,6 +36,7 @@ executable hw-succinct-example
 library
   hs-source-dirs:       src
   exposed-modules:      HaskellWorks.Data.Json
+                      , HaskellWorks.Data.Json.Extract
                       , HaskellWorks.Data.Json.Succinct
                       , HaskellWorks.Data.Json.Succinct.Cursor
                       , HaskellWorks.Data.Json.Succinct.Cursor.BalancedParens
