@@ -16,7 +16,7 @@ cabal-version:          >= 1.10
 library
   hs-source-dirs:       src
   exposed-modules:      HaskellWorks.Data.Succinct
-  build-depends:        base                            >= 4.7  && < 5
+  build-depends:        base                          >= 4          && < 5
                       , attoparsec
                       , bytestring
                       , conduit
@@ -24,7 +24,7 @@ library
                       , hw-bits
                       , hw-conduit
                       , hw-parser
-                      , hw-prim
+                      , hw-prim                       >= 0.0.1
                       , hw-rankselect
                       , mono-traversable
                       , text
