@@ -24,7 +24,7 @@ library
                       , hw-bits
                       , hw-conduit
                       , hw-parser
-                      , hw-prim                       >= 0.0.1
+                      , hw-prim                       >= 0.0.2
                       , hw-rankselect
                       , mono-traversable
                       , text
