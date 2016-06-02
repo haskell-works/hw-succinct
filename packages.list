@@ -1,6 +1,8 @@
 hw-bits
 hw-conduit
 hw-diagnostics
+hw-json
 hw-parser
 hw-prim
 hw-rankselect
+hw-xml
