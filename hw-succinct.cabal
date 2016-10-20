@@ -3,7 +3,7 @@ version:                0.0.0.15
 synopsis:               Conduits for tokenizing streams.
 description:            Please see README.md
 homepage:               http://github.com/haskell-works/hw-succinct#readme
-license:                BSD3
+license:                MIT
 license-file:           LICENSE
 author:                 John Ky
 maintainer:             newhoggy@gmail.com
@@ -26,7 +26,7 @@ library
                       , hw-diagnostics
                       , hw-json
                       , hw-parser
-                      , hw-prim
+                      , hw-prim                       >= 0.3.0.0
                       , hw-rankselect
                       , hw-xml
                       , mmap
