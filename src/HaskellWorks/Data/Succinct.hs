@@ -7,6 +7,5 @@ module HaskellWorks.Data.Succinct
     ( module X
     ) where
 
-import           HaskellWorks.Data.Succinct.BalancedParens   as X
-import           HaskellWorks.Data.Succinct.NearestNeighbour as X
-import           HaskellWorks.Data.Succinct.RankSelect       as X
+import           HaskellWorks.Data.BalancedParens   as X
+import           HaskellWorks.Data.RankSelect.Base  as X

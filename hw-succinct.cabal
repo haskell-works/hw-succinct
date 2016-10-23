@@ -1,6 +1,6 @@
 name:                   hw-succinct
 version:                0.0.0.15
-synopsis:               Conduits for tokenizing streams.
+synopsis:               Succint datastructures
 description:            Please see README.md
 homepage:               http://github.com/haskell-works/hw-succinct#readme
 license:                MIT
@@ -21,14 +21,11 @@ library
                       , bytestring
                       , conduit
                       , containers
-                      , hw-bits
-                      , hw-conduit
-                      , hw-diagnostics
-                      , hw-json
-                      , hw-parser
-                      , hw-prim                       >= 0.3.0.0
-                      , hw-rankselect
-                      , hw-xml
+                      , hw-balancedparens             >= 0.1.0.0
+                      , hw-bits                       >= 0.4.0.0
+                      , hw-prim                       >= 0.4.0.0
+                      , hw-rankselect                 >= 0.8.0.0
+                      , hw-rankselect-base            >= 0.2.0.0
                       , mmap
                       , mono-traversable
                       , text
