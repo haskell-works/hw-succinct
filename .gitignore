@@ -21,3 +21,4 @@ cabal.sandbox.config
 /*.nix.part
 /result
 /deps
+/stack.yaml

@@ -33,7 +33,7 @@ library
                       , word8
 
   default-language:     Haskell2010
-  ghc-options:          -rtsopts -with-rtsopts=-N -Wall -O2 -Wall -msse4.2
+  ghc-options:          -Wall -msse4.2
 
 source-repository head
   type:     git
